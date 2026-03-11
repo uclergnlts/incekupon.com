@@ -3,12 +3,14 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { normalizePrediction } from '@/lib/spor-toto-prediction';
+import type { TotoOutcome, TotoPrediction } from '@/types';
 
 interface TotoMatchInput {
   match_number: number;
   home_team: string;
   away_team: string;
-  prediction: '1' | '0' | '2';
+  prediction: TotoPrediction;
 }
 
 export async function createTotoWeek(data: {
@@ -35,6 +37,7 @@ export async function createTotoWeek(data: {
 
   const matchesData = data.matches.map(m => ({
     ...m,
+    prediction: normalizePrediction(m.prediction),
     week_id: week.id,
     actual_result: null,
   }));
@@ -55,7 +58,7 @@ export async function updateTotoWeek(
   data: {
     week_label: string;
     date: string;
-    matches: (TotoMatchInput & { actual_result?: '1' | '0' | '2' | null })[];
+    matches: (TotoMatchInput & { actual_result?: TotoOutcome | null })[];
   }
 ) {
   const supabase = await createClient();
@@ -83,7 +86,7 @@ export async function updateTotoWeek(
     match_number: m.match_number,
     home_team: m.home_team,
     away_team: m.away_team,
-    prediction: m.prediction,
+    prediction: normalizePrediction(m.prediction),
     actual_result: m.actual_result ?? null,
     week_id: weekId,
   }));

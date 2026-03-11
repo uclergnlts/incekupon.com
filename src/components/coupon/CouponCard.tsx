@@ -2,6 +2,7 @@ import type { Coupon } from '@/types';
 import { formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
 import MatchRow from './MatchRow';
 import { Calendar } from 'lucide-react';
+import CouponShareButton from './CouponShareButton';
 
 interface CouponCardProps {
   coupon: Coupon;
@@ -20,6 +21,7 @@ export default function CouponCard({ coupon, showResult = true }: CouponCardProp
           <span className="text-sm font-medium">{formatDate(coupon.date)}</span>
         </div>
         <div className="flex items-center gap-2">
+          <CouponShareButton coupon={coupon} />
           <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">
             Toplam: {coupon.total_odds}
           </span>

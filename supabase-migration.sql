@@ -44,7 +44,7 @@ CREATE TABLE spor_toto_matches (
   match_number smallint NOT NULL,
   home_team text NOT NULL,
   away_team text NOT NULL,
-  prediction text NOT NULL CHECK (prediction IN ('1', '0', '2')),
+  prediction text NOT NULL CHECK (prediction ~ '^(1|0|2)(-(1|0|2)){0,2}$'),
   actual_result text CHECK (actual_result IN ('1', '0', '2')),
   created_at timestamptz NOT NULL DEFAULT now()
 );

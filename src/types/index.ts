@@ -1,4 +1,6 @@
 export type CouponStatus = 'pending' | 'won' | 'lost';
+export type TotoOutcome = '1' | '0' | '2';
+export type TotoPrediction = '1' | '0' | '2' | '1-0' | '1-2' | '0-2' | '1-0-2';
 
 export interface Coupon {
   id: string;
@@ -39,12 +41,22 @@ export interface SportTotoMatch {
   match_number: number;
   home_team: string;
   away_team: string;
-  prediction: '1' | '0' | '2';
-  actual_result: '1' | '0' | '2' | null;
+  prediction: TotoPrediction;
+  actual_result: TotoOutcome | null;
   created_at: string;
 }
 
 export interface CouponStats {
+  total: number;
+  won: number;
+  lost: number;
+  pending: number;
+  winRate: number;
+}
+
+export interface MonthlyCouponStat {
+  monthKey: string;
+  monthLabel: string;
   total: number;
   won: number;
   lost: number;
