@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Geçmiş Kuponlar - Bahiis',
+  title: 'Geçmiş Kuponlar - incekupon',
   description: 'Tüm geçmiş bahis kuponları ve sonuçları.',
 };
 

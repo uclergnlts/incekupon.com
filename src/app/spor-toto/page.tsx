@@ -3,7 +3,7 @@ import { formatDate } from '@/lib/utils';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Spor Toto - Bahiis',
+  title: 'Spor Toto - incekupon',
   description: 'Haftalık Spor Toto 13 maç tahminleri.',
 };
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { Trophy } from 'lucide-react';
+import { Ticket } from 'lucide-react';
 
 export default function GirisPage() {
   const [email, setEmail] = useState('');
@@ -33,7 +33,7 @@ export default function GirisPage() {
   return (
     <div className="max-w-sm mx-auto px-4 py-16">
       <div className="text-center mb-8">
-        <Trophy className="w-12 h-12 text-primary mx-auto mb-3" />
+        <Ticket className="w-12 h-12 text-primary mx-auto mb-3" />
         <h1 className="text-2xl font-bold">Admin Girişi</h1>
       </div>
 

@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bahiis - Günlük Bahis Kuponları",
-  description: "Her gün güncel bahis kuponları, geçmiş kupon sonuçları ve Spor Toto tahminleri.",
+  title: "incekupon - Günlük Bahis Kuponları",
+  description: "Her gün güncel bahis kuponları, geçmiş kupon sonuçları ve Spor Toto tahminleri. incekupon.com",
 };
 
 export default function RootLayout({

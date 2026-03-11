@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, Trophy } from 'lucide-react';
+import { Menu, X, Ticket, Crown } from 'lucide-react';
 
 const navLinks = [
   { href: '/', label: 'Anasayfa' },
   { href: '/gecmis-kuponlar', label: 'Geçmiş Kuponlar' },
   { href: '/spor-toto', label: 'Spor Toto' },
 ];
+
+const TELEGRAM_URL = 'https://t.me/YOUR_CHANNEL'; // TODO: Telegram kanal linkini buraya ekle
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -17,8 +19,8 @@ export default function Header() {
     <header className="bg-white border-b border-border sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-          <Trophy className="w-6 h-6" />
-          <span>Bahiis</span>
+          <Ticket className="w-6 h-6" />
+          <span>ince<span className="text-foreground">kupon</span></span>
         </Link>
 
         {/* Desktop nav */}
@@ -32,6 +34,15 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+          <a
+            href={TELEGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-sm font-medium bg-primary text-white px-3 py-1.5 rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            <Crown className="w-4 h-4" />
+            VIP Grup
+          </a>
         </nav>
 
         {/* Mobile menu button */}
@@ -57,6 +68,16 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+          <a
+            href={TELEGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-primary hover:bg-blue-50"
+            onClick={() => setMenuOpen(false)}
+          >
+            <Crown className="w-4 h-4" />
+            VIP Grup
+          </a>
         </nav>
       )}
     </header>

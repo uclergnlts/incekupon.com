@@ -15,22 +15,12 @@ interface MatchFormData {
   odds: number;
 }
 
-const PREDICTIONS = [
-  'MS 1', 'MS 0', 'MS 2',
-  '1.5 Alt', '1.5 Üst',
-  '2.5 Alt', '2.5 Üst',
-  '3.5 Alt', '3.5 Üst',
-  'KG Var', 'KG Yok',
-  'Çifte Şans 1-0', 'Çifte Şans 1-2', 'Çifte Şans 0-2',
-  'İY MS 1/1', 'İY MS 1/0', 'İY MS 0/1',
-];
-
 const emptyMatch: MatchFormData = {
   league: '',
   home_team: '',
   away_team: '',
   match_time: '',
-  prediction: 'MS 1',
+  prediction: '',
   odds: 1.50,
 };
 
@@ -201,15 +191,14 @@ export default function CouponForm({ coupon }: CouponFormProps) {
               </div>
               <div>
                 <label className="block text-xs text-muted mb-1">Tahmin</label>
-                <select
+                <input
+                  type="text"
                   value={match.prediction}
                   onChange={(e) => updateMatch(index, 'prediction', e.target.value)}
+                  required
+                  placeholder="MS 1, 2.5 Üst..."
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-                >
-                  {PREDICTIONS.map(p => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
+                />
               </div>
               <div>
                 <label className="block text-xs text-muted mb-1">Oran</label>
