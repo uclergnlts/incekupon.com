@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Toaster } from 'sonner';
+import { getSiteSettings } from '@/lib/queries/site-settings';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -52,17 +53,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
   return (
     <html lang="tr">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-[radial-gradient(circle_at_top,#eef5ff_0%,#f8fafc_40%,#f8fafc_100%)]`}
       >
-        <Header />
+        <Header vipChannelUrl={settings.vip_telegram_url} />
         <main className="flex-1">
           {children}
         </main>

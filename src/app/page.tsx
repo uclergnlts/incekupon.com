@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Crown, History, LineChart } from 'lucide-react';
 import CouponList from '@/components/coupon/CouponList';
 import BankoHighlight, { type FeaturedMatch } from '@/components/home/BankoHighlight';
 import { getRecentCoupons, getTodayCoupons } from '@/lib/queries/coupons';
 import { getTodayBanko } from '@/lib/queries/banko';
+import { getSiteSettings } from '@/lib/queries/site-settings';
 import type { Coupon, DailyBanko } from '@/types';
 
 export const metadata: Metadata = {
@@ -51,23 +52,59 @@ function pickFeaturedMatch(coupons: Coupon[]): FeaturedMatch | null {
 }
 
 export default async function HomePage() {
-  const [todayCoupons, recentCoupons, todayBanko] = await Promise.all([
+  const [todayCoupons, recentCoupons, todayBanko, settings] = await Promise.all([
     getTodayCoupons(),
     getRecentCoupons(5),
     getTodayBanko(),
+    getSiteSettings(),
   ]);
 
-  // Admin'den eklenen banko varsa onu goster, yoksa kuponlardan otomatik sec
   const featuredMatch = todayBanko
     ? bankoToFeaturedMatch(todayBanko)
     : pickFeaturedMatch(todayCoupons);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-      <BankoHighlight match={featuredMatch} />
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-6 sm:p-8 shadow-[0_30px_70px_-55px_rgba(15,23,42,0.8)]">
+        <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-blue-100/60 blur-2xl" />
+        <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+          <div className="max-w-2xl">
+            <p className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 mb-3">
+              Gunluk kupon merkezi
+            </p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900">
+              Gunun kuponlari, banko maclar ve gecmis performans tek ekranda.
+            </h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed">
+              Kuponlari anlik takip et, gecmis sonuclari incele ve Spor Toto performansini tek bir deneyimde gor.
+            </p>
+          </div>
 
-      <section>
-        <h2 className="text-lg font-bold mb-4">Gunun Kuponlari</h2>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Link href="/gecmis-kuponlar" className="admin-btn-secondary">
+              <History className="w-4 h-4" /> Gecmis Kuponlar
+            </Link>
+            <Link
+              href={settings.vip_telegram_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2.5 text-sm font-semibold text-white"
+            >
+              <Crown className="w-4 h-4" /> VIP Kanal
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <BankoHighlight match={featuredMatch} vipChannelUrl={settings.vip_telegram_url} />
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">Gunun Kuponlari</h2>
+          <Link href="/aylik-istatistik" className="text-sm font-semibold text-primary inline-flex items-center gap-1">
+            Performans <LineChart className="w-4 h-4" />
+          </Link>
+        </div>
         <CouponList
           coupons={todayCoupons}
           showResult={false}
@@ -75,12 +112,12 @@ export default async function HomePage() {
         />
       </section>
 
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold">Son Kuponlar</h2>
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">Son Kuponlar</h2>
           <Link
             href="/gecmis-kuponlar"
-            className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+            className="text-sm font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1"
           >
             Tumunu gor <ArrowRight className="w-4 h-4" />
           </Link>

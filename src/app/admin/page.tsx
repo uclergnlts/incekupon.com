@@ -1,167 +1,75 @@
-import { getCoupons, getCouponStats, getMonthlyCouponStats } from '@/lib/queries/coupons';
-import { getBankoByDate } from '@/lib/queries/banko';
-import { formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
 import Link from 'next/link';
-import { Plus, Edit, ExternalLink, TrendingUp, TrendingDown, ShieldCheck } from 'lucide-react';
-import DeleteCouponButton from '@/components/admin/DeleteCouponButton';
+import { ChevronRight, ListChecks, PlusSquare, ShieldCheck, Trophy, Crown } from 'lucide-react';
+import VipChannelForm from '@/components/admin/VipChannelForm';
+import { getSiteSettings } from '@/lib/queries/site-settings';
+
+const menuItems = [
+  {
+    title: 'Kuponlar',
+    description: 'Tum kuponlari goruntule, duzenle ve sonuclari takip et.',
+    href: '/admin/kuponlar',
+    icon: ListChecks,
+  },
+  {
+    title: 'Yeni Kupon',
+    description: 'Gunluk kupon olustur ve API fixture secicisi ile mac ekle.',
+    href: '/admin/kupon/yeni',
+    icon: PlusSquare,
+  },
+  {
+    title: 'Gunun Bankosu',
+    description: 'One cikan banko maci yonet ve anasayfada vurgula.',
+    href: '/admin/banko',
+    icon: ShieldCheck,
+  },
+  {
+    title: 'Spor Toto',
+    description: 'Haftalik Spor Toto tahminlerini olustur ve guncelle.',
+    href: '/admin/spor-toto',
+    icon: Trophy,
+  },
+];
 
 export default async function AdminDashboard() {
-  const today = new Date().toISOString().split('T')[0];
-  const [{ coupons }, stats, monthlyStats, todayBanko] = await Promise.all([
-    getCoupons({ limit: 20 }),
-    getCouponStats(),
-    getMonthlyCouponStats(3),
-    getBankoByDate(today),
-  ]);
-
-  const currentMonth = monthlyStats[monthlyStats.length - 1];
-  const prevMonth = monthlyStats[monthlyStats.length - 2];
-  const trend = currentMonth && prevMonth
-    ? currentMonth.winRate - prevMonth.winRate
-    : 0;
+  const settings = await getSiteSettings();
 
   return (
     <div className="admin-shell space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="admin-title">Admin Dashboard</h1>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/admin/banko"
-            className="admin-btn-secondary"
-          >
-            <ShieldCheck className="w-4 h-4" /> Banko
-          </Link>
-          <Link
-            href="/admin/kupon/yeni"
-            className="admin-btn-primary"
-          >
-            <Plus className="w-4 h-4" /> Yeni Kupon
-          </Link>
+      <div className="admin-panel p-5 sm:p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border-none">
+        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold mb-3">
+          <Crown className="w-3.5 h-3.5" />
+          Admin Kontrol Paneli
         </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Yonetim Menuleri</h1>
+        <p className="text-sm text-white/75 mt-2 max-w-2xl">
+          Panel girisinde sadece yonetim menuleri gosterilir. Asagidaki modullerden ilgili ekrana gecis yapabilirsiniz.
+        </p>
       </div>
 
-      {/* Today's Banko Status */}
-      <Link
-        href="/admin/banko"
-        className={`block rounded-xl border p-4 transition-colors ${
-          todayBanko
-            ? 'admin-panel-soft hover:brightness-[1.02]'
-            : 'bg-amber-50 border-amber-200 hover:bg-amber-100'
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <ShieldCheck className={`w-5 h-5 ${todayBanko ? 'text-primary' : 'text-yellow-600'}`} />
-          {todayBanko ? (
-            <div>
-              <p className="text-sm font-medium text-primary">
-                Gunun Bankosu: {todayBanko.home_team} - {todayBanko.away_team}
-              </p>
-              <p className="text-xs text-muted">
-                {todayBanko.league} | {todayBanko.prediction} @ {todayBanko.odds}
-              </p>
-            </div>
-          ) : (
-            <p className="text-sm font-medium text-yellow-800">
-              Bugun icin banko eklenmedi - tiklayarak ekleyin
-            </p>
-          )}
-        </div>
-      </Link>
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {menuItems.map(item => {
+          const Icon = item.icon;
 
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div className="admin-panel p-3 text-center">
-          <p className="text-2xl font-bold">{stats.total}</p>
-          <p className="text-xs text-muted">Toplam</p>
-        </div>
-        <div className="admin-panel p-3 text-center">
-          <p className="text-2xl font-bold text-success">{stats.won}</p>
-          <p className="text-xs text-muted">Kazanan</p>
-        </div>
-        <div className="admin-panel p-3 text-center">
-          <p className="text-2xl font-bold text-danger">{stats.lost}</p>
-          <p className="text-xs text-muted">Kaybeden</p>
-        </div>
-        <div className="admin-panel p-3 text-center">
-          <p className="text-2xl font-bold text-primary">%{stats.winRate}</p>
-          <p className="text-xs text-muted">Basari Orani</p>
-        </div>
-        <div className="admin-panel p-3 text-center">
-          <div className="flex items-center justify-center gap-1">
-            {trend >= 0 ? (
-              <TrendingUp className="w-5 h-5 text-success" />
-            ) : (
-              <TrendingDown className="w-5 h-5 text-danger" />
-            )}
-            <p className={`text-2xl font-bold ${trend >= 0 ? 'text-success' : 'text-danger'}`}>
-              {trend > 0 ? '+' : ''}{trend}%
-            </p>
-          </div>
-          <p className="text-xs text-muted">Aylik Trend</p>
-        </div>
-      </div>
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="admin-panel p-4 sm:p-5 group transition-all hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 inline-flex items-center justify-center">
+                  <Icon className="w-5 h-5" />
+                </div>
+                <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
+              </div>
+              <h2 className="mt-4 text-base font-bold text-slate-900">{item.title}</h2>
+              <p className="mt-1 text-sm text-slate-600 leading-relaxed">{item.description}</p>
+            </Link>
+          );
+        })}
+      </section>
 
-      {/* Coupon list */}
-      <div className="admin-table-wrap">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50 border-b border-border">
-                <th className="text-left px-4 py-3 font-medium text-muted">Tarih</th>
-                <th className="text-center px-4 py-3 font-medium text-muted">Mac</th>
-                <th className="text-center px-4 py-3 font-medium text-muted">Oran</th>
-                <th className="text-center px-4 py-3 font-medium text-muted">Durum</th>
-                <th className="text-center px-4 py-3 font-medium text-muted">Link</th>
-                <th className="text-right px-4 py-3 font-medium text-muted">Islem</th>
-              </tr>
-            </thead>
-            <tbody>
-              {coupons.map(coupon => (
-                <tr key={coupon.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3">{formatDate(coupon.date)}</td>
-                  <td className="px-4 py-3 text-center">{coupon.matches?.length ?? 0}</td>
-                  <td className="px-4 py-3 text-center font-medium">{coupon.total_odds}</td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`text-xs font-bold px-2 py-1 rounded ${getStatusColor(coupon.status)}`}>
-                      {getStatusLabel(coupon.status)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {coupon.played_coupon_url ? (
-                      <a
-                        href={coupon.played_coupon_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-primary hover:text-primary-dark"
-                        title={coupon.played_coupon_url}
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    ) : (
-                      <span className="text-xs text-muted">-</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/admin/kupon/${coupon.id}`}
-                        className="p-2 rounded-lg text-muted hover:bg-slate-100 hover:text-primary"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Link>
-                      <DeleteCouponButton couponId={coupon.id} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {coupons.length === 0 && (
-          <div className="text-center py-8 text-muted">Henuz kupon eklenmedi.</div>
-        )}
-      </div>
+      <VipChannelForm initialUrl={settings.vip_telegram_url} updatedAt={settings.updated_at} />
     </div>
   );
 }
-

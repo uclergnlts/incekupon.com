@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Crown, Menu, X } from 'lucide-react';
 
 const navLinks = [
@@ -12,79 +13,96 @@ const navLinks = [
   { href: '/aylik-istatistik', label: 'Aylik Istatistik' },
 ];
 
-const TELEGRAM_URL = 'https://t.me/YOUR_CHANNEL';
+interface HeaderProps {
+  vipChannelUrl: string;
+}
 
-export default function Header() {
+export default function Header({ vipChannelUrl }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <header className="bg-white border-b border-border sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/95">
-      <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md supports-[backdrop-filter]:bg-white/80">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+        <Link href="/" className="flex items-center gap-2.5 font-extrabold text-lg text-slate-900">
           <Image
             src="/logo-mark.svg"
             alt="incekupon logo"
-            width={28}
-            height={28}
+            width={30}
+            height={30}
             className="rounded-md"
             priority
           />
           <span>
-            ince<span className="text-foreground">kupon</span>
+            ince<span className="text-primary">kupon</span>
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-muted hover:text-foreground transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav className="hidden lg:flex items-center gap-1.5">
+          {navLinks.map(link => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-colors ${
+                  isActive
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
           <a
-            href={TELEGRAM_URL}
+            href={vipChannelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-sm font-medium bg-primary text-white px-3 py-1.5 rounded-lg hover:bg-primary-dark transition-colors"
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:brightness-105"
           >
             <Crown className="w-4 h-4" />
-            VIP Grup
+            VIP Kanal
           </a>
         </nav>
 
         <button
-          className="md:hidden p-2"
+          className="lg:hidden p-2 rounded-lg border border-slate-200"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Menu"
         >
-          {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {menuOpen && (
-        <nav className="md:hidden border-t border-border bg-white">
-          {navLinks.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="block px-4 py-3 text-sm font-medium text-muted hover:bg-gray-50 hover:text-foreground"
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav className="lg:hidden border-t border-slate-200 bg-white/95 backdrop-blur p-3 space-y-1">
+          {navLinks.map(link => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block rounded-lg px-3 py-2 text-sm font-medium ${
+                  isActive
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
           <a
-            href={TELEGRAM_URL}
+            href={vipChannelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-primary hover:bg-blue-50"
+            className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-2 text-sm font-semibold text-white"
             onClick={() => setMenuOpen(false)}
           >
             <Crown className="w-4 h-4" />
-            VIP Grup
+            VIP Kanal
           </a>
         </nav>
       )}

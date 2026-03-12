@@ -15,7 +15,7 @@ export default function CouponList({
 }: CouponListProps) {
   if (coupons.length === 0) {
     return (
-      <div className="text-center py-12 text-muted">
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-8 text-center text-slate-500">
         <p>{emptyMessage}</p>
       </div>
     );

@@ -27,10 +27,16 @@ export default async function AdminLayout({
               Dashboard
             </Link>
             <Link
+              href="/admin/kuponlar"
+              className="rounded-full border border-border bg-white px-3 py-1.5 font-medium text-muted transition-colors hover:border-primary/40 hover:text-primary"
+            >
+              Kuponlar
+            </Link>
+            <Link
               href="/admin/kupon/yeni"
               className="rounded-full border border-border bg-white px-3 py-1.5 font-medium text-muted transition-colors hover:border-primary/40 hover:text-primary"
             >
-              Yeni Kupon
+              Yeni
             </Link>
             <Link
               href="/admin/spor-toto"

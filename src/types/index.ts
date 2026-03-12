@@ -77,3 +77,9 @@ export interface MonthlyCouponStat {
   pending: number;
   winRate: number;
 }
+
+export interface SiteSettings {
+  id: boolean;
+  vip_telegram_url: string;
+  updated_at: string;
+}

@@ -1,9 +1,19 @@
+import Link from 'next/link';
+
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-border mt-auto">
-      <div className="max-w-5xl mx-auto px-4 py-6 text-center text-sm text-muted">
-        <p>incekupon &copy; {new Date().getFullYear()} - Gunluk Bahis Kuponlari</p>
-        <p className="mt-1 text-xs">Bu site sadece bilgilendirme amaclidir.</p>
+    <footer className="mt-auto border-t border-slate-200 bg-white/80 backdrop-blur">
+      <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-slate-800">incekupon &copy; {new Date().getFullYear()}</p>
+          <p className="text-xs text-slate-500 mt-1">Bahis icerikleri bilgilendirme amaclidir.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+          <Link href="/" className="hover:text-slate-700">Anasayfa</Link>
+          <Link href="/gecmis-kuponlar" className="hover:text-slate-700">Gecmis Kuponlar</Link>
+          <Link href="/spor-toto" className="hover:text-slate-700">Spor Toto</Link>
+          <Link href="/aylik-istatistik" className="hover:text-slate-700">Aylik Istatistik</Link>
+        </div>
       </div>
     </footer>
   );

@@ -29,26 +29,24 @@ export default async function AylikIstatistikPage() {
   const overallRate = decided > 0 ? Math.round((summary.won / decided) * 100) : 0;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Aylik Istatistik</h1>
-        <p className="text-sm text-muted">
-          Son 12 ayin kupon performansi ve kazanma oranlari.
-        </p>
-      </div>
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      <section className="rounded-2xl border border-slate-200 bg-white/95 p-5 sm:p-6">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Aylik Istatistik</h1>
+        <p className="text-sm text-slate-600 mt-2">Son 12 ayin kupon performansi ve kazanma trendi.</p>
+      </section>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="bg-white rounded-xl border border-border p-4">
-          <p className="text-xs text-muted">Toplam Kupon</p>
-          <p className="text-2xl font-bold">{summary.total}</p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white/95 p-4">
+          <p className="text-xs text-slate-500">Toplam Kupon</p>
+          <p className="text-2xl font-extrabold text-slate-900">{summary.total}</p>
         </div>
-        <div className="bg-white rounded-xl border border-border p-4">
-          <p className="text-xs text-muted">Kazanilan</p>
-          <p className="text-2xl font-bold text-success">{summary.won}</p>
+        <div className="rounded-2xl border border-slate-200 bg-white/95 p-4">
+          <p className="text-xs text-slate-500">Kazanilan</p>
+          <p className="text-2xl font-extrabold text-green-600">{summary.won}</p>
         </div>
-        <div className="bg-white rounded-xl border border-border p-4">
-          <p className="text-xs text-muted">Genel Basari Orani</p>
-          <p className="text-2xl font-bold text-primary">%{overallRate}</p>
+        <div className="rounded-2xl border border-slate-200 bg-white/95 p-4">
+          <p className="text-xs text-slate-500">Genel Basari Orani</p>
+          <p className="text-2xl font-extrabold text-primary">%{overallRate}</p>
         </div>
       </div>
 

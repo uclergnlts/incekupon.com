@@ -2,7 +2,7 @@ import { getCoupons } from '@/lib/queries/coupons';
 import CouponList from '@/components/coupon/CouponList';
 import CouponFilters from '@/components/filters/CouponFilters';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, History } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -43,31 +43,37 @@ export default async function GecmisKuponlarPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-bold">Geçmiş Kuponlar</h1>
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      <section className="rounded-2xl border border-slate-200 bg-white/95 p-5 sm:p-6">
+        <div className="flex items-center gap-2 mb-2">
+          <History className="w-4 h-4 text-slate-500" />
+          <p className="text-sm font-semibold text-slate-700">Arsiv</p>
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Gecmis Kuponlar</h1>
+        <p className="text-sm text-slate-600 mt-2">Filtreleyerek tum gecmis kupon performansini detayli inceleyin.</p>
+      </section>
 
       <CouponFilters />
 
-      <CouponList coupons={coupons} emptyMessage="Bu kriterlere uygun kupon bulunamadı." />
+      <CouponList coupons={coupons} emptyMessage="Bu kriterlere uygun kupon bulunamadi." />
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-4">
+        <div className="flex items-center justify-center gap-2 pt-2">
           {page > 1 && (
             <Link
               href={buildPageUrl(page - 1)}
-              className="flex items-center gap-1 px-3 py-2 text-sm border border-border rounded-lg hover:bg-gray-50"
+              className="admin-btn-secondary"
             >
-              <ChevronLeft className="w-4 h-4" /> Önceki
+              <ChevronLeft className="w-4 h-4" /> Onceki
             </Link>
           )}
-          <span className="text-sm text-muted px-3">
+          <span className="text-sm text-slate-600 px-3 py-2">
             {page} / {totalPages}
           </span>
           {page < totalPages && (
             <Link
               href={buildPageUrl(page + 1)}
-              className="flex items-center gap-1 px-3 py-2 text-sm border border-border rounded-lg hover:bg-gray-50"
+              className="admin-btn-secondary"
             >
               Sonraki <ChevronRight className="w-4 h-4" />
             </Link>

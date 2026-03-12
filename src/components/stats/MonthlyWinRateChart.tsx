@@ -6,10 +6,10 @@ interface MonthlyWinRateChartProps {
 
 export default function MonthlyWinRateChart({ stats }: MonthlyWinRateChartProps) {
   return (
-    <div className="bg-white rounded-xl border border-border p-5">
+    <div className="rounded-2xl border border-slate-200 bg-white/95 p-5 sm:p-6">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-lg font-bold">Aylik Kazanma Orani</h2>
-        <span className="text-xs text-muted">Son {stats.length} ay</span>
+        <h2 className="text-lg font-bold text-slate-900">Aylik Kazanma Orani</h2>
+        <span className="text-xs text-slate-500">Son {stats.length} ay</span>
       </div>
 
       <div className="grid grid-cols-6 md:grid-cols-12 gap-3 items-end h-64">
@@ -18,14 +18,14 @@ export default function MonthlyWinRateChart({ stats }: MonthlyWinRateChartProps)
 
           return (
             <div key={item.monthKey} className="flex flex-col items-center gap-2">
-              <div className="text-[11px] font-semibold text-muted">{item.winRate}%</div>
-              <div className="w-full max-w-10 h-44 rounded-lg bg-gray-100 relative overflow-hidden">
+              <div className="text-[11px] font-semibold text-slate-500">{item.winRate}%</div>
+              <div className="w-full max-w-10 h-44 rounded-lg bg-slate-100 relative overflow-hidden">
                 <div
-                  className="absolute bottom-0 inset-x-0 rounded-lg bg-gradient-to-t from-blue-600 to-sky-400 transition-all duration-500"
+                  className="absolute bottom-0 inset-x-0 rounded-lg bg-gradient-to-t from-cyan-600 to-blue-500 transition-all duration-500"
                   style={{ height: `${barHeight}%` }}
                 />
               </div>
-              <div className="text-[10px] text-muted text-center leading-tight">{item.monthLabel}</div>
+              <div className="text-[10px] text-slate-500 text-center leading-tight">{item.monthLabel}</div>
             </div>
           );
         })}
