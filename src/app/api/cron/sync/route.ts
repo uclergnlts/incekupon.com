@@ -10,9 +10,8 @@ import {
 import { evaluatePrediction } from '@/lib/prediction-evaluator';
 import { revalidatePath } from 'next/cache';
 
-// Vercel Cron calls this every 2 hours.
-// It syncs results for all pending coupons.
-// Uses API requests for the dates needed by pending matches.
+// Combined cron: fetches today's fixtures + syncs results for pending coupons.
+// Runs once daily via Vercel Cron.
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
@@ -22,23 +21,39 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Yetkisiz erisim.' }, { status: 401 });
   }
 
+  const now = new Date();
+  const istanbulOffset = 3 * 60 * 60 * 1000;
+  const istanbulNow = new Date(now.getTime() + istanbulOffset);
+  const dateKey = istanbulNow.toISOString().split('T')[0];
+
+  // --- Step 1: Fetch today's fixtures ---
+  const fixturesResult = await fetchApiFootballFixturesByDate(dateKey);
+
+  // --- Step 2: Sync results for pending coupons ---
   const supabase = await createClient();
 
-  // Get all pending coupons
   const { data: pendingCoupons, error: queryError } = await supabase
     .from('coupons')
     .select('id, date, matches(*)')
     .eq('status', 'pending');
 
   if (queryError) {
-    return NextResponse.json({ ok: false, message: queryError.message }, { status: 500 });
+    return NextResponse.json({
+      ok: false,
+      fixtures: { ok: fixturesResult.ok, date: dateKey, count: fixturesResult.fixtures.length },
+      results: { ok: false, message: queryError.message },
+    }, { status: 500 });
   }
 
   if (!pendingCoupons || pendingCoupons.length === 0) {
-    return NextResponse.json({ ok: true, message: 'Bekleyen kupon yok.', updatedCount: 0 });
+    return NextResponse.json({
+      ok: true,
+      fixtures: { ok: fixturesResult.ok, date: dateKey, count: fixturesResult.fixtures.length },
+      results: { ok: true, message: 'Bekleyen kupon yok.', updatedCount: 0 },
+      fetchedAt: new Date().toISOString(),
+    });
   }
 
-  // Collect unique dates from pending matches
   const dateKeys = new Set<string>();
   for (const coupon of pendingCoupons) {
     const matches = (coupon.matches ?? []) as Array<{ match_time: string }>;
@@ -47,12 +62,12 @@ export async function GET(request: Request) {
     }
   }
 
-  // Fetch fixtures for all needed dates (with caching per date)
   const fixtureCache = new Map<string, Awaited<ReturnType<typeof fetchApiFootballFixturesByDate>>>();
+  fixtureCache.set(dateKey, fixturesResult);
 
-  for (const dateKey of dateKeys) {
-    if (!fixtureCache.has(dateKey)) {
-      fixtureCache.set(dateKey, await fetchApiFootballFixturesByDate(dateKey));
+  for (const dk of dateKeys) {
+    if (!fixtureCache.has(dk)) {
+      fixtureCache.set(dk, await fetchApiFootballFixturesByDate(dk));
     }
   }
 
@@ -79,13 +94,11 @@ export async function GET(request: Request) {
       const allFixtures = searchDates.flatMap(dk => {
         const cached = fixtureCache.get(dk);
         if (!cached && !fixtureCache.has(dk)) {
-          // Lazy-fetch dates we haven't fetched yet
           return [];
         }
         return cached?.fixtures ?? [];
       });
 
-      // Fetch any missing dates
       for (const dk of searchDates) {
         if (!fixtureCache.has(dk)) {
           fixtureCache.set(dk, await fetchApiFootballFixturesByDate(dk));
@@ -141,12 +154,15 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    message: `Sonuc senkronu tamamlandi.`,
-    couponsChecked: pendingCoupons.length,
-    updatedCount: totalUpdated,
-    pendingCount: totalPending,
-    unmatchedCount: totalUnmatched,
-    datesFetched: fixtureCache.size,
+    fixtures: { ok: fixturesResult.ok, date: dateKey, count: fixturesResult.fixtures.length },
+    results: {
+      ok: true,
+      couponsChecked: pendingCoupons.length,
+      updatedCount: totalUpdated,
+      pendingCount: totalPending,
+      unmatchedCount: totalUnmatched,
+      datesFetched: fixtureCache.size,
+    },
     fetchedAt: new Date().toISOString(),
   });
 }
