@@ -10,9 +10,9 @@ import {
 import { evaluatePrediction } from '@/lib/prediction-evaluator';
 import { revalidatePath } from 'next/cache';
 
-// Vercel Cron calls this at 00:00 Istanbul time every day.
-// It syncs results for all pending coupons from today.
-// Uses 1 API request (today's fixtures with results).
+// Vercel Cron calls this every 2 hours.
+// It syncs results for all pending coupons.
+// Uses API requests for the dates needed by pending matches.
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');

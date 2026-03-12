@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { fetchApiFootballFixturesByDate } from '@/lib/api-football';
 
-// Vercel Cron calls this at 08:00 Istanbul time every day.
+// Vercel Cron calls this every 2 hours.
 // It fetches today's fixtures and warms the cache.
-// Only 1 API request per day for fixtures.
+// Intended cadence: 1 API request every 2 hours for today's fixtures.
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
