@@ -7,6 +7,7 @@ export interface Coupon {
   date: string;
   status: CouponStatus;
   total_odds: number;
+  played_coupon_url: string | null;
   notes: string | null;
   created_at: string;
   matches?: Match[];

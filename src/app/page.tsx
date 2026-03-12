@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import CouponList from '@/components/coupon/CouponList';
 import BankoHighlight, { type FeaturedMatch } from '@/components/home/BankoHighlight';
-import ProfitCalculator from '@/components/home/ProfitCalculator';
 import { getRecentCoupons, getTodayCoupons } from '@/lib/queries/coupons';
 import type { Coupon } from '@/types';
 
@@ -32,13 +31,9 @@ export default async function HomePage() {
   ]);
 
   const featuredMatch = pickFeaturedMatch(todayCoupons);
-  const initialOdds = featuredMatch?.odds ?? todayCoupons[0]?.total_odds ?? 1.8;
-
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
       <BankoHighlight match={featuredMatch} />
-
-      <ProfitCalculator initialOdds={initialOdds} />
 
       <section>
         <h2 className="text-lg font-bold mb-4">Gunun Kuponlari</h2>

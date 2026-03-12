@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { createCoupon, updateCoupon } from '@/lib/actions/coupon-actions';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Coupon, Match } from '@/types';
+import { createCoupon, updateCoupon } from '@/lib/actions/coupon-actions';
+import type { Coupon } from '@/types';
 
 interface MatchFormData {
   league: string;
@@ -21,7 +21,7 @@ const emptyMatch: MatchFormData = {
   away_team: '',
   match_time: '',
   prediction: '',
-  odds: 1.50,
+  odds: 1.5,
 };
 
 interface CouponFormProps {
@@ -32,20 +32,22 @@ export default function CouponForm({ coupon }: CouponFormProps) {
   const isEdit = !!coupon;
 
   const [date, setDate] = useState(coupon?.date ?? new Date().toISOString().split('T')[0]);
+  const [playedCouponUrl, setPlayedCouponUrl] = useState(coupon?.played_coupon_url ?? '');
   const [notes, setNotes] = useState(coupon?.notes ?? '');
   const [matches, setMatches] = useState<MatchFormData[]>(() => {
     if (coupon?.matches?.length) {
       return coupon.matches
         .sort((a, b) => a.sort_order - b.sort_order)
-        .map(m => ({
-          league: m.league,
-          home_team: m.home_team,
-          away_team: m.away_team,
-          match_time: m.match_time.slice(0, 16), // datetime-local format
-          prediction: m.prediction,
-          odds: m.odds,
+        .map(match => ({
+          league: match.league,
+          home_team: match.home_team,
+          away_team: match.away_team,
+          match_time: match.match_time.slice(0, 16),
+          prediction: match.prediction,
+          odds: match.odds,
         }));
     }
+
     return [{ ...emptyMatch }];
   });
   const [loading, setLoading] = useState(false);
@@ -56,80 +58,96 @@ export default function CouponForm({ coupon }: CouponFormProps) {
 
   function removeMatch(index: number) {
     if (matches.length <= 1) return;
-    setMatches(matches.filter((_, i) => i !== index));
+    setMatches(matches.filter((_, itemIndex) => itemIndex !== index));
   }
 
   function updateMatch(index: number, field: keyof MatchFormData, value: string | number) {
-    const updated = [...matches];
-    updated[index] = { ...updated[index], [field]: value };
-    setMatches(updated);
+    const updatedMatches = [...matches];
+    updatedMatches[index] = { ...updatedMatches[index], [field]: value };
+    setMatches(updatedMatches);
   }
 
-  const totalOdds = matches.reduce((acc, m) => acc * (m.odds || 1), 1);
+  const totalOdds = matches.reduce((acc, match) => acc * (match.odds || 1), 1);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setLoading(true);
 
     try {
-      const matchesData = matches.map((m, i) => ({
-        ...m,
-        odds: Number(m.odds),
-        sort_order: i + 1,
+      const matchesData = matches.map((match, index) => ({
+        ...match,
+        odds: Number(match.odds),
+        sort_order: index + 1,
       }));
 
+      const payload = {
+        date,
+        played_coupon_url: playedCouponUrl,
+        notes,
+        matches: matchesData,
+      };
+
       if (isEdit) {
-        await updateCoupon(coupon.id, { date, notes, matches: matchesData });
-        toast.success('Kupon güncellendi.');
+        await updateCoupon(coupon.id, payload);
+        toast.success('Kupon guncellendi.');
       } else {
-        await createCoupon({ date, notes, matches: matchesData });
-        toast.success('Kupon oluşturuldu.');
+        await createCoupon(payload);
+        toast.success('Kupon olusturuldu.');
       }
     } catch {
-      toast.error('Bir hata oluştu.');
+      toast.error('Bir hata olustu.');
       setLoading(false);
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Date & Notes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">Tarih</label>
           <input
             type="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={event => setDate(event.target.value)}
             required
             className="w-full border border-border rounded-lg px-3 py-2 text-sm"
           />
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-1">Not (opsiyonel)</label>
+          <label className="block text-sm font-medium mb-1">Oynanan Kupon Linki</label>
           <input
-            type="text"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Kupon notu..."
+            type="url"
+            value={playedCouponUrl}
+            onChange={event => setPlayedCouponUrl(event.target.value)}
+            required
+            placeholder="https://..."
             className="w-full border border-border rounded-lg px-3 py-2 text-sm"
           />
         </div>
       </div>
 
-      {/* Matches */}
+      <div>
+        <label className="block text-sm font-medium mb-1">Not (opsiyonel)</label>
+        <input
+          type="text"
+          value={notes}
+          onChange={event => setNotes(event.target.value)}
+          placeholder="Kupon notu..."
+          className="w-full border border-border rounded-lg px-3 py-2 text-sm"
+        />
+      </div>
+
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium">Maçlar</h3>
-          <span className="text-sm text-primary font-bold">
-            Toplam Oran: {totalOdds.toFixed(2)}
-          </span>
+          <h3 className="font-medium">Maclar</h3>
+          <span className="text-sm text-primary font-bold">Toplam Oran: {totalOdds.toFixed(2)}</span>
         </div>
 
         {matches.map((match, index) => (
           <div key={index} className="bg-gray-50 rounded-xl p-4 space-y-3 border border-border">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-muted">Maç {index + 1}</span>
+              <span className="text-sm font-medium text-muted">Mac {index + 1}</span>
               {matches.length > 1 && (
                 <button
                   type="button"
@@ -146,9 +164,9 @@ export default function CouponForm({ coupon }: CouponFormProps) {
               <input
                 type="text"
                 value={match.league}
-                onChange={(e) => updateMatch(index, 'league', e.target.value)}
+                onChange={event => updateMatch(index, 'league', event.target.value)}
                 required
-                placeholder="Süper Lig"
+                placeholder="Super Lig"
                 className="w-full border border-border rounded-lg px-3 py-2 text-sm"
               />
             </div>
@@ -159,20 +177,21 @@ export default function CouponForm({ coupon }: CouponFormProps) {
                 <input
                   type="text"
                   value={match.home_team}
-                  onChange={(e) => updateMatch(index, 'home_team', e.target.value)}
+                  onChange={event => updateMatch(index, 'home_team', event.target.value)}
                   required
                   placeholder="Galatasaray"
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm"
                 />
               </div>
+
               <div>
                 <label className="block text-xs text-muted mb-1">Deplasman</label>
                 <input
                   type="text"
                   value={match.away_team}
-                  onChange={(e) => updateMatch(index, 'away_team', e.target.value)}
+                  onChange={event => updateMatch(index, 'away_team', event.target.value)}
                   required
-                  placeholder="Fenerbahçe"
+                  placeholder="Fenerbahce"
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm"
                 />
               </div>
@@ -184,22 +203,24 @@ export default function CouponForm({ coupon }: CouponFormProps) {
                 <input
                   type="datetime-local"
                   value={match.match_time}
-                  onChange={(e) => updateMatch(index, 'match_time', e.target.value)}
+                  onChange={event => updateMatch(index, 'match_time', event.target.value)}
                   required
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm"
                 />
               </div>
+
               <div>
                 <label className="block text-xs text-muted mb-1">Tahmin</label>
                 <input
                   type="text"
                   value={match.prediction}
-                  onChange={(e) => updateMatch(index, 'prediction', e.target.value)}
+                  onChange={event => updateMatch(index, 'prediction', event.target.value)}
                   required
-                  placeholder="MS 1, 2.5 Üst..."
+                  placeholder="MS 1, 2.5 Ust..."
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm"
                 />
               </div>
+
               <div>
                 <label className="block text-xs text-muted mb-1">Oran</label>
                 <input
@@ -207,7 +228,7 @@ export default function CouponForm({ coupon }: CouponFormProps) {
                   step="0.01"
                   min="1"
                   value={match.odds}
-                  onChange={(e) => updateMatch(index, 'odds', parseFloat(e.target.value) || 1)}
+                  onChange={event => updateMatch(index, 'odds', parseFloat(event.target.value) || 1)}
                   required
                   className="w-full border border-border rounded-lg px-3 py-2 text-sm"
                 />
@@ -221,7 +242,7 @@ export default function CouponForm({ coupon }: CouponFormProps) {
           onClick={addMatch}
           className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-xl py-3 text-sm text-muted hover:border-primary hover:text-primary transition-colors"
         >
-          <Plus className="w-4 h-4" /> Maç Ekle
+          <Plus className="w-4 h-4" /> Mac Ekle
         </button>
       </div>
 
@@ -231,9 +252,8 @@ export default function CouponForm({ coupon }: CouponFormProps) {
         className="w-full bg-primary text-white font-medium rounded-lg px-4 py-3 text-sm hover:bg-primary-dark disabled:opacity-50 transition-colors"
       >
         {loading
-          ? (isEdit ? 'Güncelleniyor...' : 'Oluşturuluyor...')
-          : (isEdit ? 'Kuponu Güncelle' : 'Kuponu Oluştur')
-        }
+          ? (isEdit ? 'Guncelleniyor...' : 'Olusturuluyor...')
+          : (isEdit ? 'Kuponu Guncelle' : 'Kuponu Olustur')}
       </button>
     </form>
   );

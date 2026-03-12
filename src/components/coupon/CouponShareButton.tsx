@@ -19,7 +19,11 @@ function buildCouponShareText(coupon: Coupon): string {
     ? `Maclar: ${sortedMatches.join(' | ')}`
     : 'Mac detaylari yakinda eklenecek.';
 
-  return `Incekupon kuponu (Toplam oran: ${coupon.total_odds}) ${matchSummary}`;
+  const proofLine = coupon.played_coupon_url
+    ? `Bu kuponu oynadigimiz link: ${coupon.played_coupon_url}`
+    : 'Bu kuponu oynadigimiz link: admin tarafindan eklenmemis';
+
+  return `Incekupon kuponu (Toplam oran: ${coupon.total_odds}) ${matchSummary} ${proofLine}`;
 }
 
 export default function CouponShareButton({ coupon }: CouponShareButtonProps) {

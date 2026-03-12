@@ -9,6 +9,7 @@ CREATE TABLE coupons (
   date date NOT NULL,
   status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'won', 'lost')),
   total_odds numeric(10,2) NOT NULL DEFAULT 1.00,
+  played_coupon_url text NOT NULL,
   notes text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
