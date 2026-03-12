@@ -8,9 +8,9 @@ import { Crown, Menu, X } from 'lucide-react';
 
 const navLinks = [
   { href: '/', label: 'Anasayfa' },
-  { href: '/gecmis-kuponlar', label: 'Gecmis Kuponlar' },
+  { href: '/gecmis-kuponlar', label: 'Geçmiş Kuponlar' },
   { href: '/spor-toto', label: 'Spor Toto' },
-  { href: '/aylik-istatistik', label: 'Aylik Istatistik' },
+  { href: '/aylik-istatistik', label: 'Aylık İstatistik' },
 ];
 
 interface HeaderProps {

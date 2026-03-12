@@ -16,14 +16,14 @@ function buildCouponShareText(coupon: Coupon): string {
     .map(match => `${match.home_team}-${match.away_team}: ${match.prediction} (${match.odds})`);
 
   const matchSummary = sortedMatches.length > 0
-    ? `Maclar: ${sortedMatches.join(' | ')}`
-    : 'Mac detaylari yakinda eklenecek.';
+    ? `Maçlar: ${sortedMatches.join(' | ')}`
+    : 'Maç detayları yakında eklenecek.';
 
   const proofLine = coupon.played_coupon_url
-    ? `Bu kuponu oynadigimiz link: ${coupon.played_coupon_url}`
-    : 'Bu kuponu oynadigimiz link: admin tarafindan eklenmemis';
+    ? `Bu kuponu oynadığımız link: ${coupon.played_coupon_url}`
+    : 'Bu kuponu oynadığımız link: eklenmemiş';
 
-  return `Incekupon kuponu (Toplam oran: ${coupon.total_odds}) ${matchSummary} ${proofLine}`;
+  return `İncekupon kuponu (Toplam oran: ${coupon.total_odds}) ${matchSummary} ${proofLine}`;
 }
 
 export default function CouponShareButton({ coupon }: CouponShareButtonProps) {
@@ -74,10 +74,10 @@ export default function CouponShareButton({ coupon }: CouponShareButtonProps) {
       <button
         type="button"
         onClick={() => setMenuOpen(prev => !prev)}
-        className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-xs font-semibold text-muted hover:bg-gray-100 hover:text-foreground transition-colors"
+        className="inline-flex items-center gap-1.5 rounded-md border border-slate-600 px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
       >
         {menuOpen ? <X className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
-        Paylas
+        Paylaş
       </button>
 
       {menuOpen && (

@@ -9,11 +9,11 @@ import { getSiteSettings } from '@/lib/queries/site-settings';
 import type { Coupon, DailyBanko } from '@/types';
 
 export const metadata: Metadata = {
-  title: 'incekupon - Gunluk Bahis Kuponlari ve Tahminler',
-  description: 'Her gun guncel bahis kuponlari, banko mac tavsiyeleri, gecmis kupon sonuclari ve Spor Toto tahminleri.',
+  title: 'İncekupon - Günlük Bahis Kuponları ve Tahminler',
+  description: 'Her gün güncel bahis kuponları, banko maç tavsiyeleri, geçmiş kupon sonuçları ve Spor Toto tahminleri.',
   openGraph: {
-    title: 'incekupon - Gunluk Bahis Kuponlari',
-    description: 'Her gun guncel bahis kuponlari, banko mac tavsiyeleri ve gecmis kupon sonuclari.',
+    title: 'İncekupon - Günlük Bahis Kuponları',
+    description: 'Her gün güncel bahis kuponları, banko maç tavsiyeleri ve geçmiş kupon sonuçları.',
     type: 'website',
   },
 };
@@ -69,19 +69,19 @@ export default async function HomePage() {
         <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="max-w-2xl">
             <p className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 mb-3 border border-slate-200">
-              Gunluk kupon merkezi
+              Günlük kupon merkezi
             </p>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900">
-              Gunun kuponlari, banko maclar ve gecmis performans tek ekranda.
+              Günün kuponları, banko maçlar ve geçmiş performans tek ekranda.
             </h1>
             <p className="text-sm sm:text-base text-slate-600 mt-4 font-medium leading-relaxed">
-              Kuponlari anlik takip et, gecmis sonuclari incele ve Spor Toto performansini tek bir deneyimde gor.
+              Kuponları anlık takip et, geçmiş sonuçları incele ve Spor Toto performansını tek bir deneyimde gör.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href="/gecmis-kuponlar" className="admin-btn-secondary">
-              <History className="w-4 h-4" /> Gecmis Kuponlar
+              <History className="w-4 h-4" /> Geçmiş Kuponlar
             </Link>
             <Link
               href={settings.vip_telegram_url}
@@ -99,7 +99,7 @@ export default async function HomePage() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900">Gunun Kuponlari</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">Günün Kuponları</h2>
           <Link href="/aylik-istatistik" className="text-sm font-semibold text-primary inline-flex items-center gap-1">
             Performans <LineChart className="w-4 h-4" />
           </Link>
@@ -107,7 +107,7 @@ export default async function HomePage() {
         <CouponList
           coupons={todayCoupons}
           showResult={false}
-          emptyMessage="Bugun icin henuz kupon eklenmedi."
+          emptyMessage="Bugün için henüz kupon eklenmedi."
         />
       </section>
 
@@ -118,12 +118,12 @@ export default async function HomePage() {
             href="/gecmis-kuponlar"
             className="text-sm font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1"
           >
-            Tumunu gor <ArrowRight className="w-4 h-4" />
+            Tümünü gör <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         <CouponList
           coupons={recentCoupons}
-          emptyMessage="Henuz gecmis kupon bulunmuyor."
+          emptyMessage="Henüz geçmiş kupon bulunmuyor."
         />
       </section>
     </div>

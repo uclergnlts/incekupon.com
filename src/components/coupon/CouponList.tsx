@@ -12,7 +12,7 @@ interface CouponListProps {
 export default function CouponList({
   coupons,
   showResult = true,
-  emptyMessage = 'Kupon bulunamadi.',
+  emptyMessage = 'Kupon bulunamadı.',
 }: CouponListProps) {
   if (coupons.length === 0) {
     return (
@@ -22,7 +22,7 @@ export default function CouponList({
         </div>
         <p className="text-sm font-bold text-slate-700">{emptyMessage}</p>
         <p className="text-xs font-medium text-slate-500 mt-1 max-w-xs">
-          Su an mac analizleri devam ediyor. Lutfen daha sonra tekrar kontrol edin.
+          Şu an maç analizleri devam ediyor. Lütfen daha sonra tekrar kontrol edin.
         </p>
       </div>
     );

@@ -13,17 +13,17 @@ export default function CouponCard({ coupon, showResult = true }: CouponCardProp
   const sortedMatches = [...(coupon.matches ?? [])].sort((a, b) => a.sort_order - b.sort_order);
 
   return (
-    <article className="group overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-3.5 bg-slate-50 border-b border-slate-300">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-slate-500" />
-          <span className="text-sm font-semibold text-slate-800">{formatDate(coupon.date)}</span>
+    <article className="group overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 bg-slate-800 border-b border-slate-900">
+        <div className="flex items-center gap-2.5">
+          <Calendar className="w-4 h-4 text-slate-400" />
+          <span className="text-sm font-bold text-white uppercase tracking-wider">{formatDate(coupon.date)}</span>
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
           <CouponShareButton coupon={coupon} />
-          <span className="text-xs font-black text-white bg-slate-800 px-3 py-1.5 rounded-md shadow-sm border border-slate-700">
-            Toplam: {coupon.total_odds}
+          <span className="text-xs font-black text-slate-900 bg-amber-400 px-3 py-1.5 rounded-md shadow-sm border border-amber-500">
+            Toplam Oran: {coupon.total_odds}
           </span>
           {showResult && (
             <span className={`text-xs font-black px-3 py-1.5 rounded-md shadow-sm border ${getStatusColor(coupon.status)}`}>
@@ -48,7 +48,7 @@ export default function CouponCard({ coupon, showResult = true }: CouponCardProp
             className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
-            Oynadigimiz kupon linki
+            Oynadığımız kupon linki
           </a>
         </div>
       )}
