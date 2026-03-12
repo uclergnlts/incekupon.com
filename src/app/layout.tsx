@@ -63,7 +63,7 @@ export default async function RootLayout({
   return (
     <html lang="tr">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-[radial-gradient(circle_at_top,#eef5ff_0%,#f8fafc_40%,#f8fafc_100%)]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-slate-50`}
       >
         <Header vipChannelUrl={settings.vip_telegram_url} />
         <main className="flex-1">

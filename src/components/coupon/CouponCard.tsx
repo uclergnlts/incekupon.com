@@ -13,34 +13,34 @@ export default function CouponCard({ coupon, showResult = true }: CouponCardProp
   const sortedMatches = [...(coupon.matches ?? [])].sort((a, b) => a.sort_order - b.sort_order);
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-[0_10px_35px_-30px_rgba(15,23,42,0.55)]">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+    <article className="group overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-3.5 bg-slate-50 border-b border-slate-300">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-slate-500" />
           <span className="text-sm font-semibold text-slate-800">{formatDate(coupon.date)}</span>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <CouponShareButton coupon={coupon} />
-          <span className="text-xs font-bold text-primary bg-blue-100 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-black text-white bg-slate-800 px-3 py-1.5 rounded-md shadow-sm border border-slate-700">
             Toplam: {coupon.total_odds}
           </span>
           {showResult && (
-            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusColor(coupon.status)}`}>
+            <span className={`text-xs font-black px-3 py-1.5 rounded-md shadow-sm border ${getStatusColor(coupon.status)}`}>
               {getStatusLabel(coupon.status)}
             </span>
           )}
         </div>
       </div>
 
-      <div className="px-4 py-1">
+      <div className="px-5 py-2">
         {sortedMatches.map(match => (
           <MatchRow key={match.id} match={match} showResult={showResult} />
         ))}
       </div>
 
       {coupon.played_coupon_url && (
-        <div className="px-4 py-3 border-t border-slate-200 bg-slate-50/80">
+        <div className="px-5 py-3.5 border-t border-slate-300 bg-slate-50">
           <a
             href={coupon.played_coupon_url}
             target="_blank"
@@ -54,8 +54,8 @@ export default function CouponCard({ coupon, showResult = true }: CouponCardProp
       )}
 
       {coupon.notes && (
-        <div className="px-4 py-3 bg-blue-50/70 border-t border-slate-200">
-          <p className="text-xs text-slate-600">{coupon.notes}</p>
+        <div className="px-5 py-3.5 bg-[#fefce8] border-t border-[#fef08a] border-opacity-60">
+          <p className="text-sm font-medium text-slate-700">{coupon.notes}</p>
         </div>
       )}
     </article>

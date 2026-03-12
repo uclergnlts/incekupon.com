@@ -22,38 +22,41 @@ interface BankoHighlightProps {
 export default function BankoHighlight({ match, vipChannelUrl }: BankoHighlightProps) {
   if (!match) {
     return (
-      <section className="rounded-2xl border border-slate-200 bg-white/90 p-6">
-        <h2 className="text-lg font-bold mb-2">Gunun Bankosu</h2>
-        <p className="text-sm text-slate-600">Bugun icin banko mac bulunamadi.</p>
+      <section className="rounded-xl border border-slate-300 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-black mb-2 text-slate-800">Gunun Bankosu</h2>
+        <p className="text-sm font-medium text-slate-600">Bugun icin banko mac bulunamadi.</p>
       </section>
     );
   }
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white/95 p-5 sm:p-6 shadow-[0_25px_60px_-45px_rgba(15,23,42,0.7)]">
-      <div className="absolute -top-20 -right-20 h-48 w-48 rounded-full bg-blue-100/60 blur-2xl" />
+    <section className="relative overflow-hidden rounded-xl border border-slate-300 bg-white p-5 sm:p-6 shadow-md transition-all hover:shadow-lg">
       <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 text-xs font-semibold bg-blue-100 text-primary px-2.5 py-1 rounded-full mb-3">
-            <ShieldCheck className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 text-xs font-black bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-md mb-3 border border-emerald-200 shadow-sm uppercase tracking-wider">
+            <ShieldCheck className="w-4 h-4" />
             Gunun Bankosu
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold leading-tight text-slate-900">
+          <h2 className="text-xl sm:text-2xl font-black leading-tight text-slate-900">
             {match.homeTeam} - {match.awayTeam}
           </h2>
-          <p className="text-sm text-slate-600 mt-1">
-            {match.league} | {formatDate(match.couponDate)} | {formatTime(match.matchTime)}
+          <p className="text-sm font-bold text-slate-500 mt-1.5 flex items-center gap-2">
+            <span>{match.league}</span>
+            <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+            <span>{formatDate(match.couponDate)}</span>
+            <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+            <span>{formatTime(match.matchTime)}</span>
           </p>
         </div>
 
         <div className="sm:text-right">
-          <p className="text-xs text-slate-500">Tahmin</p>
-          <p className="text-3xl font-black text-primary leading-none">{match.prediction}</p>
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tahmin</p>
+          <p className="text-4xl font-black text-slate-900 leading-none">{match.prediction}</p>
         </div>
       </div>
 
-      <div className="relative mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 text-primary">
+      <div className="relative mt-5 flex flex-wrap items-center gap-2.5 pt-5 border-t border-slate-100">
+        <span className="text-xs font-black px-3 py-1.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300 shadow-sm">
           Oran: {match.odds}
         </span>
         {vipChannelUrl && (
@@ -61,16 +64,18 @@ export default function BankoHighlight({ match, vipChannelUrl }: BankoHighlightP
             href={vipChannelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1.5 text-xs font-semibold text-white"
+            className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 hover:bg-amber-600 transition-all hover:-translate-y-0.5 px-4 py-2 text-xs font-bold text-white shadow-sm"
           >
-            <Crown className="w-3.5 h-3.5" />
-            VIP Kanalda Takip Et
+            <Crown className="w-4 h-4" />
+            VIP'de Takip Et
           </Link>
         )}
       </div>
 
       {match.notes && (
-        <p className="relative mt-3 text-xs text-slate-600 italic">{match.notes}</p>
+        <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-md">
+          <p className="text-sm font-medium text-slate-700">{match.notes}</p>
+        </div>
       )}
     </section>
   );

@@ -24,10 +24,10 @@ export function getStatusLabel(status: string): string {
 
 export function getStatusColor(status: string): string {
   switch (status) {
-    case 'won': return 'bg-green-100 text-green-800';
-    case 'lost': return 'bg-red-100 text-red-800';
-    case 'pending': return 'bg-yellow-100 text-yellow-800';
-    default: return 'bg-gray-100 text-gray-800';
+    case 'won': return 'bg-emerald-600 text-white border-emerald-700';
+    case 'lost': return 'bg-red-600 text-white border-red-700';
+    case 'pending': return 'bg-amber-100 text-amber-800 border-amber-300';
+    default: return 'bg-slate-100 text-slate-800 border-slate-300';
   }
 }
 

@@ -22,7 +22,7 @@ export default function Header({ vipChannelUrl }: HeaderProps) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-50 border-b border-slate-300 bg-white/95 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center gap-2.5 font-extrabold text-lg text-slate-900">
           <Image
@@ -45,9 +45,9 @@ export default function Header({ vipChannelUrl }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-colors ${
+                className={`rounded-md px-3 py-2 text-sm font-bold transition-all ${
                   isActive
-                    ? 'bg-slate-900 text-white'
+                    ? 'bg-slate-900 text-white shadow-sm'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
@@ -59,7 +59,7 @@ export default function Header({ vipChannelUrl }: HeaderProps) {
             href={vipChannelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:brightness-105"
+            className="ml-2 inline-flex items-center gap-1.5 rounded-md bg-amber-500 hover:bg-amber-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5"
           >
             <Crown className="w-4 h-4" />
             VIP Kanal
@@ -83,7 +83,7 @@ export default function Header({ vipChannelUrl }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`block rounded-lg px-3 py-2 text-sm font-medium ${
+                className={`block rounded-md px-3 py-2.5 text-sm font-bold ${
                   isActive
                     ? 'bg-slate-900 text-white'
                     : 'text-slate-700 hover:bg-slate-100'
@@ -98,7 +98,7 @@ export default function Header({ vipChannelUrl }: HeaderProps) {
             href={vipChannelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-2 text-sm font-semibold text-white"
+            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 hover:bg-amber-600 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-colors"
             onClick={() => setMenuOpen(false)}
           >
             <Crown className="w-4 h-4" />
