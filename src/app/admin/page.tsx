@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { ChevronRight, ListChecks, PlusSquare, ShieldCheck, Trophy, Crown } from 'lucide-react';
 import VipChannelForm from '@/components/admin/VipChannelForm';

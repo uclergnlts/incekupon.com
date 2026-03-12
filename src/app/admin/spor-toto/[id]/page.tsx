@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getTotoWeekById } from '@/lib/queries/spor-toto';
 import { notFound } from 'next/navigation';
 import SportTotoForm from '@/components/admin/SportTotoForm';

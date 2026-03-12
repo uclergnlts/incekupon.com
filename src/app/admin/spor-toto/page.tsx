@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getTotoWeeks } from '@/lib/queries/spor-toto';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';

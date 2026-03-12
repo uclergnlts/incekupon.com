@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from 'next';
 import { formatDate } from '@/lib/utils';
 import { predictionIncludes } from '@/lib/spor-toto-prediction';

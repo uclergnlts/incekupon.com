@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getBankoByDate } from '@/lib/queries/banko';
 import BankoForm from '@/components/admin/BankoForm';
 import { ShieldCheck } from 'lucide-react';

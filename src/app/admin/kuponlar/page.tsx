@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Edit, ExternalLink, Plus } from 'lucide-react';
 import DeleteCouponButton from '@/components/admin/DeleteCouponButton';

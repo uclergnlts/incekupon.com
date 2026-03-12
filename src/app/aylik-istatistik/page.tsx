@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from 'next';
 import MonthlyWinRateChart from '@/components/stats/MonthlyWinRateChart';
 import { getMonthlyCouponStats } from '@/lib/queries/coupons';

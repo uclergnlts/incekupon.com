@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getCoupons } from '@/lib/queries/coupons';
 import CouponList from '@/components/coupon/CouponList';
 import CouponFilters from '@/components/filters/CouponFilters';
