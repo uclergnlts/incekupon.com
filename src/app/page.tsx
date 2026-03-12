@@ -1,9 +1,20 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import CouponList from '@/components/coupon/CouponList';
 import BankoHighlight, { type FeaturedMatch } from '@/components/home/BankoHighlight';
 import { getRecentCoupons, getTodayCoupons } from '@/lib/queries/coupons';
 import type { Coupon } from '@/types';
+
+export const metadata: Metadata = {
+  title: 'incekupon - Gunluk Bahis Kuponlari ve Tahminler',
+  description: 'Her gun guncel bahis kuponlari, banko mac tavsiyeleri, gecmis kupon sonuclari ve Spor Toto tahminleri.',
+  openGraph: {
+    title: 'incekupon - Gunluk Bahis Kuponlari',
+    description: 'Her gun guncel bahis kuponlari, banko mac tavsiyeleri ve gecmis kupon sonuclari.',
+    type: 'website',
+  },
+};
 
 function pickFeaturedMatch(coupons: Coupon[]): FeaturedMatch | null {
   const candidates = coupons.flatMap(coupon =>

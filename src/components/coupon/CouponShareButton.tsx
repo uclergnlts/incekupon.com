@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Copy, MessageCircle, Share2, X } from 'lucide-react';
+import { Copy, MessageCircle, Send, Share2, X } from 'lucide-react';
 import type { Coupon } from '@/types';
 import { toast } from 'sonner';
 
@@ -89,6 +89,14 @@ export default function CouponShareButton({ coupon }: CouponShareButtonProps) {
           >
             <MessageCircle className="w-3.5 h-3.5 text-green-600" />
             WhatsApp
+          </button>
+          <button
+            type="button"
+            className="w-full text-left flex items-center gap-2 rounded-md px-2 py-2 text-xs font-medium hover:bg-gray-50"
+            onClick={() => openShareWindow(`https://t.me/share/url?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(shareText)}`)}
+          >
+            <Send className="w-3.5 h-3.5 text-blue-500" />
+            Telegram
           </button>
           <button
             type="button"

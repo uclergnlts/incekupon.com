@@ -6,8 +6,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Geçmiş Kuponlar - incekupon',
-  description: 'Tüm geçmiş bahis kuponları ve sonuçları.',
+  title: 'Gecmis Kuponlar',
+  description: 'Tum gecmis bahis kuponlari, sonuclari ve kazanma oranlari.',
+  openGraph: {
+    title: 'Gecmis Kuponlar - incekupon',
+    description: 'Tum gecmis bahis kuponlari ve sonuclari.',
+    type: 'website',
+  },
 };
 
 interface Props {

@@ -16,8 +16,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'incekupon - Gunluk Bahis Kuponlari',
-  description: 'Her gun guncel bahis kuponlari, gecmis kupon sonuclari ve Spor Toto tahminleri.',
+  title: {
+    default: 'incekupon - Gunluk Bahis Kuponlari',
+    template: '%s | incekupon',
+  },
+  description: 'Her gun guncel bahis kuponlari, gecmis kupon sonuclari, Spor Toto tahminleri ve aylik istatistikler.',
+  keywords: ['bahis kuponlari', 'iddaa tahminleri', 'spor toto', 'banko maclar', 'kupon tavsiyeleri', 'incekupon'],
+  authors: [{ name: 'incekupon' }],
+  creator: 'incekupon',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://incekupon.com'),
+  openGraph: {
+    type: 'website',
+    locale: 'tr_TR',
+    siteName: 'incekupon',
+    title: 'incekupon - Gunluk Bahis Kuponlari',
+    description: 'Her gun guncel bahis kuponlari, gecmis kupon sonuclari ve Spor Toto tahminleri.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'incekupon - Gunluk Bahis Kuponlari',
+    description: 'Her gun guncel bahis kuponlari, gecmis kupon sonuclari ve Spor Toto tahminleri.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
   icons: {
     icon: '/icon.svg',
     shortcut: '/icon.svg',

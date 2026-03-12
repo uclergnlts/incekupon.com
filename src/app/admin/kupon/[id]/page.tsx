@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import { formatTime } from '@/lib/utils';
+import { ExternalLink } from 'lucide-react';
+import { formatTime, formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
 import { getCouponById } from '@/lib/queries/coupons';
 import CouponForm from '@/components/admin/CouponForm';
 import ResultToggle from '@/components/admin/ResultToggle';
@@ -18,6 +19,38 @@ export default async function EditCouponPage({ params }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+      {/* Coupon Info Summary */}
+      <div className="bg-white rounded-xl border border-border p-4 flex flex-wrap items-center gap-4">
+        <div>
+          <p className="text-xs text-muted">Tarih</p>
+          <p className="text-sm font-semibold">{formatDate(coupon.date)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted">Toplam Oran</p>
+          <p className="text-sm font-bold text-primary">{coupon.total_odds}</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted">Durum</p>
+          <span className={`text-xs font-bold px-2 py-1 rounded ${getStatusColor(coupon.status)}`}>
+            {getStatusLabel(coupon.status)}
+          </span>
+        </div>
+        {coupon.played_coupon_url && (
+          <div>
+            <p className="text-xs text-muted">Kupon Linki</p>
+            <a
+              href={coupon.played_coupon_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:text-primary-dark"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Linki Ac
+            </a>
+          </div>
+        )}
+      </div>
+
       <section>
         <div className="flex items-center justify-between gap-3 mb-6">
           <h1 className="text-2xl font-bold">Mac Sonuclari</h1>

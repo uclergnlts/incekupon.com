@@ -41,15 +41,15 @@ export default function CouponCard({ coupon, showResult = true }: CouponCardProp
       </div>
 
       {coupon.played_coupon_url && (
-        <div className="px-4 py-2 border-t border-border">
+        <div className="px-4 py-3 border-t border-border bg-primary/5">
           <a
             href={coupon.played_coupon_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-dark"
+            className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-dark transition-colors"
           >
+            <ExternalLink className="w-4 h-4" />
             Oynadigimiz Kupon Linki
-            <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
       )}

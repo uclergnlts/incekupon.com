@@ -3,8 +3,13 @@ import MonthlyWinRateChart from '@/components/stats/MonthlyWinRateChart';
 import { getMonthlyCouponStats } from '@/lib/queries/coupons';
 
 export const metadata: Metadata = {
-  title: 'Aylik Istatistik - incekupon',
+  title: 'Aylik Istatistik',
   description: 'Ay ay kupon kazanma oranlarini ve performans ozetini goruntuleyin.',
+  openGraph: {
+    title: 'Aylik Istatistik - incekupon',
+    description: 'Aylik kupon performansi, kazanma oranlari ve trend analizi.',
+    type: 'website',
+  },
 };
 
 export default async function AylikIstatistikPage() {

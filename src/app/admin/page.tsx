@@ -1,14 +1,21 @@
-import { getCoupons, getCouponStats } from '@/lib/queries/coupons';
+import { getCoupons, getCouponStats, getMonthlyCouponStats } from '@/lib/queries/coupons';
 import { formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
 import Link from 'next/link';
-import { Plus, Edit } from 'lucide-react';
+import { Plus, Edit, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
 import DeleteCouponButton from '@/components/admin/DeleteCouponButton';
 
 export default async function AdminDashboard() {
-  const [{ coupons }, stats] = await Promise.all([
+  const [{ coupons }, stats, monthlyStats] = await Promise.all([
     getCoupons({ limit: 20 }),
     getCouponStats(),
+    getMonthlyCouponStats(3),
   ]);
+
+  const currentMonth = monthlyStats[monthlyStats.length - 1];
+  const prevMonth = monthlyStats[monthlyStats.length - 2];
+  const trend = currentMonth && prevMonth
+    ? currentMonth.winRate - prevMonth.winRate
+    : 0;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -23,7 +30,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Quick stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         <div className="bg-white rounded-lg border border-border p-3 text-center">
           <p className="text-2xl font-bold">{stats.total}</p>
           <p className="text-xs text-muted">Toplam</p>
@@ -38,7 +45,20 @@ export default async function AdminDashboard() {
         </div>
         <div className="bg-white rounded-lg border border-border p-3 text-center">
           <p className="text-2xl font-bold text-primary">%{stats.winRate}</p>
-          <p className="text-xs text-muted">Oran</p>
+          <p className="text-xs text-muted">Basari Orani</p>
+        </div>
+        <div className="bg-white rounded-lg border border-border p-3 text-center">
+          <div className="flex items-center justify-center gap-1">
+            {trend >= 0 ? (
+              <TrendingUp className="w-5 h-5 text-success" />
+            ) : (
+              <TrendingDown className="w-5 h-5 text-danger" />
+            )}
+            <p className={`text-2xl font-bold ${trend >= 0 ? 'text-success' : 'text-danger'}`}>
+              {trend > 0 ? '+' : ''}{trend}%
+            </p>
+          </div>
+          <p className="text-xs text-muted">Aylik Trend</p>
         </div>
       </div>
 
@@ -49,10 +69,11 @@ export default async function AdminDashboard() {
             <thead>
               <tr className="bg-gray-50 border-b border-border">
                 <th className="text-left px-4 py-3 font-medium text-muted">Tarih</th>
-                <th className="text-center px-4 py-3 font-medium text-muted">Maç</th>
+                <th className="text-center px-4 py-3 font-medium text-muted">Mac</th>
                 <th className="text-center px-4 py-3 font-medium text-muted">Oran</th>
                 <th className="text-center px-4 py-3 font-medium text-muted">Durum</th>
-                <th className="text-right px-4 py-3 font-medium text-muted">İşlem</th>
+                <th className="text-center px-4 py-3 font-medium text-muted">Link</th>
+                <th className="text-right px-4 py-3 font-medium text-muted">Islem</th>
               </tr>
             </thead>
             <tbody>
@@ -65,6 +86,21 @@ export default async function AdminDashboard() {
                     <span className={`text-xs font-bold px-2 py-1 rounded ${getStatusColor(coupon.status)}`}>
                       {getStatusLabel(coupon.status)}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {coupon.played_coupon_url ? (
+                      <a
+                        href={coupon.played_coupon_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-primary hover:text-primary-dark"
+                        title={coupon.played_coupon_url}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted">-</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
@@ -83,7 +119,7 @@ export default async function AdminDashboard() {
           </table>
         </div>
         {coupons.length === 0 && (
-          <div className="text-center py-8 text-muted">Henüz kupon eklenmedi.</div>
+          <div className="text-center py-8 text-muted">Henuz kupon eklenmedi.</div>
         )}
       </div>
     </div>
