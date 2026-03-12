@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Crown, History, LineChart } from 'lucide-react';
+import { ArrowRight, LineChart } from 'lucide-react';
 import CouponList from '@/components/coupon/CouponList';
 import BankoHighlight, { type FeaturedMatch } from '@/components/home/BankoHighlight';
 import { getRecentCoupons, getTodayCoupons } from '@/lib/queries/coupons';
@@ -67,36 +67,6 @@ export default async function HomePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-      <section className="relative overflow-hidden rounded-xl border border-slate-300 bg-white p-6 sm:p-8 shadow-sm">
-        <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-          <div className="max-w-2xl">
-            <p className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 mb-3 border border-slate-200">
-              Günlük kupon merkezi
-            </p>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900">
-              Günün kuponları, banko maçlar ve geçmiş performans tek ekranda.
-            </h1>
-            <p className="text-sm sm:text-base text-slate-600 mt-4 font-medium leading-relaxed">
-              Kuponları anlık takip et, geçmiş sonuçları incele ve Spor Toto performansını tek bir deneyimde gör.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/gecmis-kuponlar" className="admin-btn-secondary">
-              <History className="w-4 h-4" /> Geçmiş Kuponlar
-            </Link>
-            <Link
-              href={settings.vip_telegram_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-amber-500 hover:bg-amber-600 transition-all hover:-translate-y-0.5 px-5 py-2.5 text-sm font-bold text-white shadow-sm"
-            >
-              <Crown className="w-4 h-4" /> VIP Kanal
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <BankoHighlight match={featuredMatch} vipChannelUrl={settings.vip_telegram_url} />
 
       <section className="space-y-4">
