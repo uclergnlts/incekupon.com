@@ -4,7 +4,8 @@ import { ArrowRight } from 'lucide-react';
 import CouponList from '@/components/coupon/CouponList';
 import BankoHighlight, { type FeaturedMatch } from '@/components/home/BankoHighlight';
 import { getRecentCoupons, getTodayCoupons } from '@/lib/queries/coupons';
-import type { Coupon } from '@/types';
+import { getTodayBanko } from '@/lib/queries/banko';
+import type { Coupon, DailyBanko } from '@/types';
 
 export const metadata: Metadata = {
   title: 'incekupon - Gunluk Bahis Kuponlari ve Tahminler',
@@ -15,6 +16,20 @@ export const metadata: Metadata = {
     type: 'website',
   },
 };
+
+function bankoToFeaturedMatch(banko: DailyBanko): FeaturedMatch {
+  return {
+    couponDate: banko.date,
+    totalOdds: banko.odds,
+    league: banko.league,
+    homeTeam: banko.home_team,
+    awayTeam: banko.away_team,
+    matchTime: banko.match_time,
+    prediction: banko.prediction,
+    odds: banko.odds,
+    notes: banko.notes,
+  };
+}
 
 function pickFeaturedMatch(coupons: Coupon[]): FeaturedMatch | null {
   const candidates = coupons.flatMap(coupon =>
@@ -36,12 +51,17 @@ function pickFeaturedMatch(coupons: Coupon[]): FeaturedMatch | null {
 }
 
 export default async function HomePage() {
-  const [todayCoupons, recentCoupons] = await Promise.all([
+  const [todayCoupons, recentCoupons, todayBanko] = await Promise.all([
     getTodayCoupons(),
     getRecentCoupons(5),
+    getTodayBanko(),
   ]);
 
-  const featuredMatch = pickFeaturedMatch(todayCoupons);
+  // Admin'den eklenen banko varsa onu goster, yoksa kuponlardan otomatik sec
+  const featuredMatch = todayBanko
+    ? bankoToFeaturedMatch(todayBanko)
+    : pickFeaturedMatch(todayCoupons);
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
       <BankoHighlight match={featuredMatch} />

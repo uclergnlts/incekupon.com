@@ -1,14 +1,17 @@
 import { getCoupons, getCouponStats, getMonthlyCouponStats } from '@/lib/queries/coupons';
+import { getBankoByDate } from '@/lib/queries/banko';
 import { formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
 import Link from 'next/link';
-import { Plus, Edit, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Edit, ExternalLink, TrendingUp, TrendingDown, ShieldCheck } from 'lucide-react';
 import DeleteCouponButton from '@/components/admin/DeleteCouponButton';
 
 export default async function AdminDashboard() {
-  const [{ coupons }, stats, monthlyStats] = await Promise.all([
+  const today = new Date().toISOString().split('T')[0];
+  const [{ coupons }, stats, monthlyStats, todayBanko] = await Promise.all([
     getCoupons({ limit: 20 }),
     getCouponStats(),
     getMonthlyCouponStats(3),
+    getBankoByDate(today),
   ]);
 
   const currentMonth = monthlyStats[monthlyStats.length - 1];
@@ -19,15 +22,51 @@ export default async function AdminDashboard() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <Link
-          href="/admin/kupon/yeni"
-          className="flex items-center gap-2 bg-primary text-white font-medium rounded-lg px-4 py-2 text-sm hover:bg-primary-dark transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Yeni Kupon
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/banko"
+            className="flex items-center gap-2 border border-primary text-primary font-medium rounded-lg px-4 py-2 text-sm hover:bg-primary/5 transition-colors"
+          >
+            <ShieldCheck className="w-4 h-4" /> Banko
+          </Link>
+          <Link
+            href="/admin/kupon/yeni"
+            className="flex items-center gap-2 bg-primary text-white font-medium rounded-lg px-4 py-2 text-sm hover:bg-primary-dark transition-colors"
+          >
+            <Plus className="w-4 h-4" /> Yeni Kupon
+          </Link>
+        </div>
       </div>
+
+      {/* Today's Banko Status */}
+      <Link
+        href="/admin/banko"
+        className={`block rounded-xl border p-4 transition-colors ${
+          todayBanko
+            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
+            : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'
+        }`}
+      >
+        <div className="flex items-center gap-3">
+          <ShieldCheck className={`w-5 h-5 ${todayBanko ? 'text-primary' : 'text-yellow-600'}`} />
+          {todayBanko ? (
+            <div>
+              <p className="text-sm font-medium text-primary">
+                Gunun Bankosu: {todayBanko.home_team} - {todayBanko.away_team}
+              </p>
+              <p className="text-xs text-muted">
+                {todayBanko.league} | {todayBanko.prediction} @ {todayBanko.odds}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm font-medium text-yellow-800">
+              Bugun icin banko eklenmedi — tiklayarak ekleyin
+            </p>
+          )}
+        </div>
+      </Link>
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">

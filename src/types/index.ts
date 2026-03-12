@@ -47,6 +47,19 @@ export interface SportTotoMatch {
   created_at: string;
 }
 
+export interface DailyBanko {
+  id: string;
+  date: string;
+  league: string;
+  home_team: string;
+  away_team: string;
+  match_time: string;
+  prediction: string;
+  odds: number;
+  notes: string | null;
+  created_at: string;
+}
+
 export interface CouponStats {
   total: number;
   won: number;

@@ -10,6 +10,7 @@ export interface FeaturedMatch {
   matchTime: string;
   prediction: string;
   odds: number;
+  notes?: string | null;
 }
 
 interface BankoHighlightProps {
@@ -49,12 +50,13 @@ export default function BankoHighlight({ match }: BankoHighlightProps) {
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <span className="text-xs font-bold px-2 py-1 rounded bg-primary/10 text-primary">
-          Tek mac orani: {match.odds}
-        </span>
-        <span className="text-xs font-bold px-2 py-1 rounded bg-gray-100 text-muted">
-          Kupon toplam: {match.totalOdds}
+          Oran: {match.odds}
         </span>
       </div>
+
+      {match.notes && (
+        <p className="mt-3 text-xs text-muted italic">{match.notes}</p>
+      )}
     </section>
   );
 }

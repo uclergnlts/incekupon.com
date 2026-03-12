@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createCoupon, updateCoupon } from '@/lib/actions/coupon-actions';
+import FixturePicker from './FixturePicker';
+import type { FixtureForPicker } from '@/lib/actions/fixture-actions';
 import type { Coupon } from '@/types';
 
 interface MatchFormData {
@@ -56,6 +58,35 @@ export default function CouponForm({ coupon }: CouponFormProps) {
 
   function addMatch() {
     setMatches([...matches, { ...emptyMatch }]);
+  }
+
+  function addMatchFromFixture(fixture: FixtureForPicker) {
+    const matchTime = new Date(fixture.date);
+    const localIso = new Date(matchTime.getTime() - matchTime.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+
+    const newMatch: MatchFormData = {
+      league: fixture.leagueKey,
+      home_team: fixture.homeName,
+      away_team: fixture.awayName,
+      match_time: localIso,
+      prediction: '',
+      odds: 1.5,
+    };
+
+    // Replace the first empty match or append
+    const firstEmptyIndex = matches.findIndex(
+      m => !m.home_team && !m.away_team && !m.league,
+    );
+
+    if (firstEmptyIndex >= 0) {
+      const updated = [...matches];
+      updated[firstEmptyIndex] = newMatch;
+      setMatches(updated);
+    } else {
+      setMatches([...matches, newMatch]);
+    }
   }
 
   function removeMatch(index: number) {
@@ -167,6 +198,9 @@ export default function CouponForm({ coupon }: CouponFormProps) {
           <span className="text-sm text-primary font-bold">Toplam Oran: {totalOdds.toFixed(2)}</span>
         </div>
 
+        {/* Fixture Picker - API'den mac sec */}
+        <FixturePicker date={date} onSelect={addMatchFromFixture} />
+
         {matches.map((match, index) => (
           <div key={index} className="bg-gray-50 rounded-xl p-4 space-y-3 border border-border">
             <div className="flex items-center justify-between">
@@ -265,7 +299,7 @@ export default function CouponForm({ coupon }: CouponFormProps) {
           onClick={addMatch}
           className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-border rounded-xl py-3 text-sm text-muted hover:border-primary hover:text-primary transition-colors"
         >
-          <Plus className="w-4 h-4" /> Mac Ekle
+          <Plus className="w-4 h-4" /> Elle Mac Ekle
         </button>
       </div>
 

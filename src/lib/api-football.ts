@@ -6,6 +6,9 @@ export interface ApiFootballFixture {
   awayName: string;
   homeGoals: number | null;
   awayGoals: number | null;
+  leagueId: number;
+  leagueName: string;
+  leagueCountry: string;
 }
 
 interface ApiFootballResult {
@@ -109,6 +112,7 @@ export async function fetchApiFootballFixturesByDate(dateKey: string): Promise<A
     const payload = (await response.json()) as {
       response?: Array<{
         fixture?: { id?: number; date?: string; status?: { short?: string } };
+        league?: { id?: number; name?: string; country?: string };
         teams?: { home?: { name?: string }; away?: { name?: string } };
         goals?: { home?: number | null; away?: number | null };
       }>;
@@ -132,6 +136,9 @@ export async function fetchApiFootballFixturesByDate(dateKey: string): Promise<A
         awayName: item.teams?.away?.name ?? '',
         homeGoals: item.goals?.home ?? null,
         awayGoals: item.goals?.away ?? null,
+        leagueId: item.league?.id ?? 0,
+        leagueName: item.league?.name ?? '',
+        leagueCountry: item.league?.country ?? '',
       }))
       .filter(item => item.fixtureId > 0 && item.homeName && item.awayName);
 
