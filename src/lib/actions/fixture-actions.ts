@@ -1,6 +1,5 @@
 'use server';
 
-import { unstable_cache } from 'next/cache';
 import { fetchApiFootballFixturesByDate, type ApiFootballFixture } from '@/lib/api-football';
 
 export interface FixtureForPicker {
@@ -11,6 +10,7 @@ export interface FixtureForPicker {
   leagueName: string;
   leagueCountry: string;
   leagueKey: string;
+  statusShort: string;
 }
 
 interface DailyFixturesResult {
@@ -31,28 +31,26 @@ function toPickerFixture(f: ApiFootballFixture): FixtureForPicker {
     leagueName: f.leagueName,
     leagueCountry: f.leagueCountry,
     leagueKey,
+    statusShort: f.statusShort,
   };
 }
 
-// Fixtures cache: revalidates every 12 hours (43200 seconds)
-// This means at most 1 API call per date per 12 hours
-function getCachedFixtures(dateKey: string) {
-  return unstable_cache(
-    async () => {
-      const result = await fetchApiFootballFixturesByDate(dateKey);
-      return {
-        ...result,
-        fetchedAt: new Date().toISOString(),
-      };
-    },
-    [`daily-fixtures-${dateKey}`],
-    { revalidate: 43200, tags: [`fixtures-${dateKey}`] },
-  )();
-}
+// Simple in-memory cache to avoid redundant API calls within the same server lifecycle
+const fixtureCache = new Map<string, { data: DailyFixturesResult; timestamp: number }>();
+const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
+
+// Only exclude cancelled/abandoned matches
+const EXCLUDED_STATUSES = new Set(['CANC', 'PST', 'ABD', 'AWD', 'WO']);
 
 export async function getDailyFixtures(dateKey: string): Promise<DailyFixturesResult> {
+  // Check in-memory cache
+  const cached = fixtureCache.get(dateKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
   try {
-    const result = await getCachedFixtures(dateKey);
+    const result = await fetchApiFootballFixturesByDate(dateKey);
 
     if (!result.ok) {
       return {
@@ -65,19 +63,24 @@ export async function getDailyFixtures(dateKey: string): Promise<DailyFixturesRe
     }
 
     const pickerFixtures = result.fixtures
-      .filter(f => !['FT', 'AET', 'PEN', 'CANC', 'PST', 'ABD', 'AWD', 'WO'].includes(f.statusShort))
+      .filter(f => !EXCLUDED_STATUSES.has(f.statusShort))
       .map(toPickerFixture)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     const leagueSet = new Set(pickerFixtures.map(f => f.leagueKey));
     const leagues = Array.from(leagueSet).sort();
 
-    return {
+    const response: DailyFixturesResult = {
       ok: true,
       fixtures: pickerFixtures,
       leagues,
-      cachedAt: result.fetchedAt,
+      cachedAt: new Date().toISOString(),
     };
+
+    // Store in cache
+    fixtureCache.set(dateKey, { data: response, timestamp: Date.now() });
+
+    return response;
   } catch {
     return {
       ok: false,
