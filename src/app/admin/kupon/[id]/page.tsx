@@ -18,9 +18,9 @@ export default async function EditCouponPage({ params }: Props) {
   const sortedMatches = [...(coupon.matches ?? [])].sort((a, b) => a.sort_order - b.sort_order);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+    <div className="admin-shell max-w-3xl space-y-8">
       {/* Coupon Info Summary */}
-      <div className="bg-white rounded-xl border border-border p-4 flex flex-wrap items-center gap-4">
+      <div className="admin-panel p-4 flex flex-wrap items-center gap-4">
         <div>
           <p className="text-xs text-muted">Tarih</p>
           <p className="text-sm font-semibold">{formatDate(coupon.date)}</p>
@@ -52,16 +52,16 @@ export default async function EditCouponPage({ params }: Props) {
       </div>
 
       <section>
-        <div className="flex items-center justify-between gap-3 mb-6">
-          <h1 className="text-2xl font-bold">Mac Sonuclari</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <h1 className="admin-title">Mac Sonuclari</h1>
           <SyncCouponResultsButton couponId={coupon.id} />
         </div>
 
-        <div className="bg-white rounded-xl border border-border overflow-hidden">
+        <div className="admin-table-wrap">
           {sortedMatches.map(match => (
             <div
               key={match.id}
-              className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-gray-100 last:border-0"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted">

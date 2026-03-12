@@ -26,16 +26,16 @@ export default function ResultToggle({ match }: ResultToggleProps) {
   ];
 
   return (
-    <div className="flex gap-1">
+    <div className="flex flex-wrap justify-end gap-1.5">
       {buttons.map(btn => (
         <button
           key={btn.value}
           onClick={() => handleResult(btn.value)}
           className={cn(
-            'px-2 py-1 text-xs font-medium rounded border transition-colors',
+            'px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-colors',
             match.result === btn.value
               ? btn.activeClass
-              : 'bg-white text-muted border-border hover:bg-gray-50'
+              : 'bg-white text-muted border-border hover:bg-slate-50'
           )}
         >
           {btn.label}

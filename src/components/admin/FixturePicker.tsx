@@ -49,7 +49,6 @@ export default function FixturePicker({ date, onSelect }: FixturePickerProps) {
     }
   }, [open, fixtures.length, loading, fetchFixtures]);
 
-  // Reset when date changes
   useEffect(() => {
     setFixtures([]);
     setLeagues([]);
@@ -70,7 +69,6 @@ export default function FixturePicker({ date, onSelect }: FixturePickerProps) {
     );
   });
 
-  // Group by league
   const grouped = new Map<string, FixtureForPicker[]>();
   for (const f of filteredFixtures) {
     const list = grouped.get(f.leagueKey) ?? [];
@@ -89,14 +87,14 @@ export default function FixturePicker({ date, onSelect }: FixturePickerProps) {
   }
 
   return (
-    <div className="border border-border rounded-xl overflow-hidden">
+    <div className="admin-panel overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors text-sm font-medium text-primary"
+        className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors text-sm font-semibold text-slate-800"
       >
         <span>API&apos;den Mac Sec ({date})</span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-muted">
           {loading && <Loader2 className="w-4 h-4 animate-spin" />}
           {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </div>
@@ -104,35 +102,35 @@ export default function FixturePicker({ date, onSelect }: FixturePickerProps) {
 
       {open && (
         <div className="border-t border-border">
-          {/* Toolbar */}
-          <div className="p-3 space-y-2 bg-gray-50 border-b border-border">
-            <div className="flex gap-2">
+          <div className="p-3 space-y-3 bg-white border-b border-border">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
                 <input
                   type="text"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Takim ara..."
-                  className="w-full border border-border rounded-lg pl-8 pr-3 py-2 text-sm"
+                  className="admin-input pl-9"
                 />
               </div>
               <button
                 type="button"
                 onClick={fetchFixtures}
                 disabled={loading}
-                className="flex items-center gap-1 px-3 py-2 text-xs font-medium border border-border rounded-lg hover:bg-white disabled:opacity-50"
+                className="admin-btn-secondary px-3"
                 title="Yenile"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                Yenile
               </button>
             </div>
 
-            <div className="flex gap-2 items-center">
+            <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
               <select
                 value={selectedLeague}
                 onChange={e => setSelectedLeague(e.target.value)}
-                className="flex-1 border border-border rounded-lg px-3 py-2 text-sm"
+                className="admin-input"
               >
                 <option value="all">Tum Ligler ({fixtures.length} mac)</option>
                 {leagues.map(league => {
@@ -147,13 +145,12 @@ export default function FixturePicker({ date, onSelect }: FixturePickerProps) {
             </div>
 
             {cachedAt && (
-              <p className="text-[10px] text-muted">
+              <p className="text-[11px] text-muted">
                 Son guncelleme: {new Date(cachedAt).toLocaleString('tr-TR')}
               </p>
             )}
           </div>
 
-          {/* Fixture List */}
           <div className="max-h-80 overflow-y-auto">
             {loading && fixtures.length === 0 ? (
               <div className="flex items-center justify-center py-8 text-sm text-muted gap-2">
@@ -167,24 +164,29 @@ export default function FixturePicker({ date, onSelect }: FixturePickerProps) {
             ) : (
               Array.from(grouped.entries()).map(([leagueKey, leagueFixtures]) => (
                 <div key={leagueKey}>
-                  <div className="px-4 py-2 bg-gray-50 border-b border-border">
-                    <span className="text-xs font-bold text-muted">{leagueKey}</span>
+                  <div className="px-4 py-2.5 bg-slate-50 border-b border-border">
+                    <span className="text-xs font-bold text-slate-600">{leagueKey}</span>
                   </div>
                   {leagueFixtures.map(fixture => (
                     <button
                       key={fixture.fixtureId}
                       type="button"
                       onClick={() => handleSelect(fixture)}
-                      className="w-full text-left px-4 py-2.5 border-b border-gray-100 last:border-0 hover:bg-blue-50 transition-colors flex items-center justify-between gap-2"
+                      className="w-full text-left px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-blue-50 transition-colors flex items-center justify-between gap-2"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
+                        <p className="text-sm font-semibold truncate text-slate-800">
                           {fixture.homeName} - {fixture.awayName}
                         </p>
                       </div>
-                      <span className="text-xs text-muted whitespace-nowrap">
-                        {formatTime(fixture.date)}
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs text-muted whitespace-nowrap">
+                          {formatTime(fixture.date)}
+                        </span>
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                          {fixture.statusShort || 'NS'}
+                        </span>
+                      </div>
                     </button>
                   ))}
                 </div>

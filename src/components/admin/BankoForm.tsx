@@ -99,109 +99,110 @@ export default function BankoForm({ banko }: BankoFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label className="block text-sm font-medium mb-1">Tarih</label>
-        <input
-          type="date"
-          value={date}
-          onChange={e => setDate(e.target.value)}
-          required
-          className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-        />
-      </div>
-
-      {/* Fixture Picker */}
-      <FixturePicker date={date} onSelect={handleFixtureSelect} />
-
-      <div>
-        <label className="block text-sm font-medium mb-1">Lig</label>
-        <input
-          type="text"
-          value={league}
-          onChange={e => setLeague(e.target.value)}
-          required
-          placeholder="Super Lig"
-          className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
+      <div className="admin-panel p-4 sm:p-5 space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Ev Sahibi</label>
+          <label className="admin-label">Tarih</label>
+          <input
+            type="date"
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            required
+            className="admin-input"
+          />
+        </div>
+
+        <FixturePicker date={date} onSelect={handleFixtureSelect} />
+
+        <div>
+          <label className="admin-label">Lig</label>
           <input
             type="text"
-            value={homeTeam}
-            onChange={e => setHomeTeam(e.target.value)}
+            value={league}
+            onChange={e => setLeague(e.target.value)}
             required
-            placeholder="Galatasaray"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm"
+            placeholder="Super Lig"
+            className="admin-input"
           />
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="admin-label">Ev Sahibi</label>
+            <input
+              type="text"
+              value={homeTeam}
+              onChange={e => setHomeTeam(e.target.value)}
+              required
+              placeholder="Galatasaray"
+              className="admin-input"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Deplasman</label>
+            <input
+              type="text"
+              value={awayTeam}
+              onChange={e => setAwayTeam(e.target.value)}
+              required
+              placeholder="Fenerbahce"
+              className="admin-input"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="admin-label">Saat</label>
+            <input
+              type="datetime-local"
+              value={matchTime}
+              onChange={e => setMatchTime(e.target.value)}
+              required
+              className="admin-input"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Tahmin</label>
+            <input
+              type="text"
+              value={prediction}
+              onChange={e => setPrediction(e.target.value)}
+              required
+              placeholder="MS 1"
+              className="admin-input"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Oran</label>
+            <input
+              type="number"
+              step="0.01"
+              min="1"
+              value={odds}
+              onChange={e => setOdds(parseFloat(e.target.value) || 1)}
+              required
+              className="admin-input"
+            />
+          </div>
+        </div>
+
         <div>
-          <label className="block text-sm font-medium mb-1">Deplasman</label>
-          <input
-            type="text"
-            value={awayTeam}
-            onChange={e => setAwayTeam(e.target.value)}
-            required
-            placeholder="Fenerbahce"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm"
+          <label className="admin-label">Not (opsiyonel)</label>
+          <textarea
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            placeholder="Banko notu..."
+            rows={3}
+            className="admin-input resize-y min-h-[88px]"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Saat</label>
-          <input
-            type="datetime-local"
-            value={matchTime}
-            onChange={e => setMatchTime(e.target.value)}
-            required
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Tahmin</label>
-          <input
-            type="text"
-            value={prediction}
-            onChange={e => setPrediction(e.target.value)}
-            required
-            placeholder="MS 1"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Oran</label>
-          <input
-            type="number"
-            step="0.01"
-            min="1"
-            value={odds}
-            onChange={e => setOdds(parseFloat(e.target.value) || 1)}
-            required
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-1">Not (opsiyonel)</label>
-        <input
-          type="text"
-          value={notes}
-          onChange={e => setNotes(e.target.value)}
-          placeholder="Banko notu..."
-          className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-        />
-      </div>
-
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-primary text-white font-medium rounded-lg px-4 py-3 text-sm hover:bg-primary-dark disabled:opacity-50 transition-colors"
+          className="admin-btn-primary flex-1 py-3"
         >
           {loading ? 'Kaydediliyor...' : 'Bankoyu Kaydet'}
         </button>
@@ -210,7 +211,7 @@ export default function BankoForm({ banko }: BankoFormProps) {
             type="button"
             onClick={handleDelete}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-3 text-sm font-medium border border-danger text-danger rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors"
+            className="admin-btn-danger"
           >
             <Trash2 className="w-4 h-4" />
             Sil

@@ -17,10 +17,10 @@ export default function AdminLogout() {
   return (
     <button
       onClick={handleLogout}
-      className="flex items-center gap-1 text-sm text-white/80 hover:text-white"
+      className="admin-btn-secondary text-xs sm:text-sm"
     >
       <LogOut className="w-4 h-4" />
-      Çıkış
+      Cikis
     </button>
   );
 }

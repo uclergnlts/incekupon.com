@@ -26,7 +26,11 @@ export default function DeleteCouponButton({ couponId }: { couponId: string }) {
   }
 
   return (
-    <button onClick={handleDelete} className="p-1.5 text-muted hover:text-danger">
+    <button
+      onClick={handleDelete}
+      className="p-2 rounded-lg text-muted hover:bg-red-50 hover:text-danger"
+      aria-label="Kuponu sil"
+    >
       <Trash2 className="w-4 h-4" />
     </button>
   );

@@ -28,7 +28,7 @@ export default function SyncCouponResultsButton({ couponId }: SyncCouponResultsB
       type="button"
       onClick={handleSync}
       disabled={isPending}
-      className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-border hover:bg-gray-50 disabled:opacity-60"
+      className="admin-btn-secondary w-full sm:w-auto"
     >
       <RefreshCw className={`w-4 h-4 ${isPending ? 'animate-spin' : ''}`} />
       {isPending ? 'Senkronize Ediliyor...' : 'API-Football Sonuclari Cek'}

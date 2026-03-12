@@ -9,11 +9,10 @@ interface Props {
 export default async function EditTotoWeekPage({ params }: Props) {
   const { id } = await params;
 
-  // "yeni" ise yeni oluştur
   if (id === 'yeni') {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Yeni Spor Toto Haftası</h1>
+      <div className="admin-shell max-w-3xl">
+        <h1 className="admin-title mb-6">Yeni Spor Toto Haftasi</h1>
         <SportTotoForm />
       </div>
     );
@@ -23,8 +22,8 @@ export default async function EditTotoWeekPage({ params }: Props) {
   if (!week) notFound();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">{week.week_label} - Düzenle</h1>
+    <div className="admin-shell max-w-3xl">
+      <h1 className="admin-title mb-6">{week.week_label} - Duzenle</h1>
       <SportTotoForm week={week} />
     </div>
   );

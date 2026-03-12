@@ -126,45 +126,121 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Hafta Adi</label>
-          <input
-            type="text"
-            value={weekLabel}
-            onChange={event => setWeekLabel(event.target.value)}
-            required
-            placeholder="2026 Hafta 10"
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-          />
+      <div className="admin-panel p-4 sm:p-5 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="admin-label">Hafta Adi</label>
+            <input
+              type="text"
+              value={weekLabel}
+              onChange={event => setWeekLabel(event.target.value)}
+              required
+              placeholder="2026 Hafta 10"
+              className="admin-input"
+            />
+          </div>
+
+          <div>
+            <label className="admin-label">Tarih</label>
+            <input
+              type="date"
+              value={date}
+              onChange={event => setDate(event.target.value)}
+              required
+              className="admin-input"
+            />
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Tarih</label>
-          <input
-            type="date"
-            value={date}
-            onChange={event => setDate(event.target.value)}
-            required
-            className="w-full border border-border rounded-lg px-3 py-2 text-sm"
-          />
+        <div className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
+          Haftalik mac sayisi: <span className="ml-1 font-semibold text-slate-900">{WEEK_MATCH_COUNT}</span>
         </div>
       </div>
 
-      <div className="text-sm text-muted">
-        Haftalik mac sayisi: <span className="font-semibold text-foreground">{WEEK_MATCH_COUNT}</span>
+      <div className="md:hidden space-y-3">
+        {matches.map((match, index) => {
+          const selected = splitPrediction(match.prediction);
+
+          return (
+            <div key={match.match_number} className="admin-panel p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-800">Mac {match.match_number}</p>
+                {isEdit && (
+                  <select
+                    value={match.actual_result ?? ''}
+                    onChange={event => updateMatch(index, 'actual_result', event.target.value || null)}
+                    className="admin-input w-20 min-h-9 h-9 px-2 py-1 text-sm"
+                  >
+                    <option value="">-</option>
+                    <option value="1">1</option>
+                    <option value="0">0</option>
+                    <option value="2">2</option>
+                  </select>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="admin-label">Ev Sahibi</label>
+                  <input
+                    type="text"
+                    value={match.home_team}
+                    onChange={event => updateMatch(index, 'home_team', event.target.value)}
+                    required
+                    className="admin-input"
+                  />
+                </div>
+                <div>
+                  <label className="admin-label">Deplasman</label>
+                  <input
+                    type="text"
+                    value={match.away_team}
+                    onChange={event => updateMatch(index, 'away_team', event.target.value)}
+                    required
+                    className="admin-input"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="admin-label">Tahmin (Coklu)</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {PREDICTION_OPTIONS.map(option => {
+                    const isActive = selected.includes(option);
+
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => togglePrediction(index, option)}
+                        className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                          isActive
+                            ? 'bg-primary text-white border-primary'
+                            : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                        }`}
+                        aria-pressed={isActive}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="hidden md:block admin-table-wrap overflow-x-auto">
+        <table className="w-full text-sm min-w-[920px]">
           <thead>
-            <tr className="bg-gray-50 border-b border-border">
+            <tr className="bg-slate-50 border-b border-border">
               <th className="text-left px-3 py-2 font-medium text-muted w-8">#</th>
               <th className="text-left px-3 py-2 font-medium text-muted">Ev Sahibi</th>
               <th className="text-left px-3 py-2 font-medium text-muted">Deplasman</th>
-              <th className="text-center px-3 py-2 font-medium text-muted w-48">Tahmin (Coklu)</th>
+              <th className="text-center px-3 py-2 font-medium text-muted w-56">Tahmin (Coklu)</th>
               {isEdit && (
-                <th className="text-center px-3 py-2 font-medium text-muted w-20">Sonuc</th>
+                <th className="text-center px-3 py-2 font-medium text-muted w-24">Sonuc</th>
               )}
             </tr>
           </thead>
@@ -182,7 +258,7 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
                       value={match.home_team}
                       onChange={event => updateMatch(index, 'home_team', event.target.value)}
                       required
-                      className="w-full border border-border rounded px-2 py-1 text-sm"
+                      className="admin-input min-h-10 h-10 px-2.5"
                     />
                   </td>
 
@@ -192,12 +268,12 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
                       value={match.away_team}
                       onChange={event => updateMatch(index, 'away_team', event.target.value)}
                       required
-                      className="w-full border border-border rounded px-2 py-1 text-sm"
+                      className="admin-input min-h-10 h-10 px-2.5"
                     />
                   </td>
 
                   <td className="px-3 py-2 text-center">
-                    <div className="inline-flex rounded-lg border border-border overflow-hidden">
+                    <div className="inline-flex rounded-lg border border-slate-300 overflow-hidden bg-white">
                       {PREDICTION_OPTIONS.map(option => {
                         const isActive = selected.includes(option);
 
@@ -206,10 +282,10 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
                             key={option}
                             type="button"
                             onClick={() => togglePrediction(index, option)}
-                            className={`px-3 py-1.5 text-sm font-semibold border-r last:border-r-0 border-border transition-colors ${
+                            className={`px-3 py-2 text-sm font-semibold border-r last:border-r-0 border-slate-200 transition-colors ${
                               isActive
                                 ? 'bg-primary text-white'
-                                : 'bg-white text-foreground hover:bg-gray-50'
+                                : 'bg-white text-slate-700 hover:bg-slate-50'
                             }`}
                             aria-pressed={isActive}
                           >
@@ -225,7 +301,7 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
                       <select
                         value={match.actual_result ?? ''}
                         onChange={event => updateMatch(index, 'actual_result', event.target.value || null)}
-                        className="border border-border rounded px-2 py-1 text-sm text-center"
+                        className="admin-input min-h-10 h-10 px-2.5 text-center"
                       >
                         <option value="">-</option>
                         <option value="1">1</option>
@@ -244,7 +320,7 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-primary text-white font-medium rounded-lg px-4 py-3 text-sm hover:bg-primary-dark disabled:opacity-50 transition-colors"
+        className="admin-btn-primary w-full py-3"
       >
         {loading
           ? (isEdit ? 'Guncelleniyor...' : 'Olusturuluyor...')

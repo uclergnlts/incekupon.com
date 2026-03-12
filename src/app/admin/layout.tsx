@@ -16,23 +16,38 @@ export default async function AdminLayout({
   }
 
   return (
-    <div>
-      <div className="bg-primary text-white">
-        <div className="max-w-5xl mx-auto px-4 h-12 flex items-center justify-between">
-          <nav className="flex items-center gap-4 text-sm">
-            <Link href="/admin" className="font-medium hover:text-white/80">
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-white/95 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <nav className="flex items-center gap-2 overflow-x-auto whitespace-nowrap text-sm [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <Link
+              href="/admin"
+              className="rounded-full border border-border bg-white px-3 py-1.5 font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+            >
               Dashboard
             </Link>
-            <Link href="/admin/kupon/yeni" className="hover:text-white/80">
+            <Link
+              href="/admin/kupon/yeni"
+              className="rounded-full border border-border bg-white px-3 py-1.5 font-medium text-muted transition-colors hover:border-primary/40 hover:text-primary"
+            >
               Yeni Kupon
             </Link>
-            <Link href="/admin/spor-toto" className="hover:text-white/80">
+            <Link
+              href="/admin/spor-toto"
+              className="rounded-full border border-border bg-white px-3 py-1.5 font-medium text-muted transition-colors hover:border-primary/40 hover:text-primary"
+            >
               Spor Toto
+            </Link>
+            <Link
+              href="/admin/banko"
+              className="rounded-full border border-border bg-white px-3 py-1.5 font-medium text-muted transition-colors hover:border-primary/40 hover:text-primary"
+            >
+              Banko
             </Link>
           </nav>
           <AdminLogout />
         </div>
-      </div>
+      </header>
       {children}
     </div>
   );

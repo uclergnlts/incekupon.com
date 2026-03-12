@@ -21,19 +21,19 @@ export default async function AdminDashboard() {
     : 0;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div className="admin-shell space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <h1 className="admin-title">Admin Dashboard</h1>
         <div className="flex items-center gap-2">
           <Link
             href="/admin/banko"
-            className="flex items-center gap-2 border border-primary text-primary font-medium rounded-lg px-4 py-2 text-sm hover:bg-primary/5 transition-colors"
+            className="admin-btn-secondary"
           >
             <ShieldCheck className="w-4 h-4" /> Banko
           </Link>
           <Link
             href="/admin/kupon/yeni"
-            className="flex items-center gap-2 bg-primary text-white font-medium rounded-lg px-4 py-2 text-sm hover:bg-primary-dark transition-colors"
+            className="admin-btn-primary"
           >
             <Plus className="w-4 h-4" /> Yeni Kupon
           </Link>
@@ -45,8 +45,8 @@ export default async function AdminDashboard() {
         href="/admin/banko"
         className={`block rounded-xl border p-4 transition-colors ${
           todayBanko
-            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
-            : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'
+            ? 'admin-panel-soft hover:brightness-[1.02]'
+            : 'bg-amber-50 border-amber-200 hover:bg-amber-100'
         }`}
       >
         <div className="flex items-center gap-3">
@@ -62,31 +62,31 @@ export default async function AdminDashboard() {
             </div>
           ) : (
             <p className="text-sm font-medium text-yellow-800">
-              Bugun icin banko eklenmedi — tiklayarak ekleyin
+              Bugun icin banko eklenmedi - tiklayarak ekleyin
             </p>
           )}
         </div>
       </Link>
 
       {/* Quick stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-        <div className="bg-white rounded-lg border border-border p-3 text-center">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="admin-panel p-3 text-center">
           <p className="text-2xl font-bold">{stats.total}</p>
           <p className="text-xs text-muted">Toplam</p>
         </div>
-        <div className="bg-white rounded-lg border border-border p-3 text-center">
+        <div className="admin-panel p-3 text-center">
           <p className="text-2xl font-bold text-success">{stats.won}</p>
           <p className="text-xs text-muted">Kazanan</p>
         </div>
-        <div className="bg-white rounded-lg border border-border p-3 text-center">
+        <div className="admin-panel p-3 text-center">
           <p className="text-2xl font-bold text-danger">{stats.lost}</p>
           <p className="text-xs text-muted">Kaybeden</p>
         </div>
-        <div className="bg-white rounded-lg border border-border p-3 text-center">
+        <div className="admin-panel p-3 text-center">
           <p className="text-2xl font-bold text-primary">%{stats.winRate}</p>
           <p className="text-xs text-muted">Basari Orani</p>
         </div>
-        <div className="bg-white rounded-lg border border-border p-3 text-center">
+        <div className="admin-panel p-3 text-center">
           <div className="flex items-center justify-center gap-1">
             {trend >= 0 ? (
               <TrendingUp className="w-5 h-5 text-success" />
@@ -102,11 +102,11 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Coupon list */}
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
+      <div className="admin-table-wrap">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-border">
+              <tr className="bg-slate-50 border-b border-border">
                 <th className="text-left px-4 py-3 font-medium text-muted">Tarih</th>
                 <th className="text-center px-4 py-3 font-medium text-muted">Mac</th>
                 <th className="text-center px-4 py-3 font-medium text-muted">Oran</th>
@@ -145,7 +145,7 @@ export default async function AdminDashboard() {
                     <div className="flex items-center justify-end gap-2">
                       <Link
                         href={`/admin/kupon/${coupon.id}`}
-                        className="p-1.5 text-muted hover:text-primary"
+                        className="p-2 rounded-lg text-muted hover:bg-slate-100 hover:text-primary"
                       >
                         <Edit className="w-4 h-4" />
                       </Link>
@@ -164,3 +164,4 @@ export default async function AdminDashboard() {
     </div>
   );
 }
+
