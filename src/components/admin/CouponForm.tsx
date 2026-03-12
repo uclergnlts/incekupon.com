@@ -69,6 +69,12 @@ export default function CouponForm({ coupon }: CouponFormProps) {
 
   const totalOdds = matches.reduce((acc, match) => acc * (match.odds || 1), 1);
 
+  function normalizeLinkInput(value: string): string {
+    const raw = value.trim();
+    if (!raw) return raw;
+    return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
@@ -82,7 +88,7 @@ export default function CouponForm({ coupon }: CouponFormProps) {
 
       const payload = {
         date,
-        played_coupon_url: playedCouponUrl,
+        played_coupon_url: normalizeLinkInput(playedCouponUrl),
         notes,
         matches: matchesData,
       };
@@ -94,8 +100,9 @@ export default function CouponForm({ coupon }: CouponFormProps) {
         await createCoupon(payload);
         toast.success('Kupon olusturuldu.');
       }
-    } catch {
-      toast.error('Bir hata olustu.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Bir hata olustu.';
+      toast.error(message);
       setLoading(false);
     }
   }
@@ -117,11 +124,11 @@ export default function CouponForm({ coupon }: CouponFormProps) {
         <div>
           <label className="block text-sm font-medium mb-1">Oynanan Kupon Linki</label>
           <input
-            type="url"
+            type="text"
             value={playedCouponUrl}
             onChange={event => setPlayedCouponUrl(event.target.value)}
             required
-            placeholder="https://..."
+            placeholder="ornekbahis.com/kupon/123"
             className="w-full border border-border rounded-lg px-3 py-2 text-sm"
           />
         </div>

@@ -22,11 +22,32 @@ interface CouponPayload {
 }
 
 function validateCouponUrl(value: string): string {
-  const url = value.trim();
-  if (!/^https?:\/\//i.test(url)) {
-    throw new Error('Gecerli bir kupon linki girin');
+  const raw = value.trim();
+  const normalized = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+
+  try {
+    const parsed = new URL(normalized);
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      throw new Error();
+    }
+    return parsed.toString();
+  } catch {
+    throw new Error('Gecerli bir kupon linki girin (ornek: https://site.com/kupon)');
   }
-  return url;
+}
+
+function normalizeCouponError(error: unknown): never {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as { message: unknown }).message === 'string' &&
+    (error as { message: string }).message.includes('played_coupon_url')
+  ) {
+    throw new Error('Veritabani guncel degil: supabase-coupon-played-link.sql dosyasini calistirin.');
+  }
+
+  throw error;
 }
 
 export async function createCoupon(data: CouponPayload) {
@@ -53,7 +74,7 @@ export async function createCoupon(data: CouponPayload) {
     .select()
     .single();
 
-  if (couponError) throw couponError;
+  if (couponError) normalizeCouponError(couponError);
 
   const matchesData = data.matches.map(match => ({
     ...match,
@@ -91,7 +112,7 @@ export async function updateCoupon(couponId: string, data: CouponPayload) {
     })
     .eq('id', couponId);
 
-  if (couponError) throw couponError;
+  if (couponError) normalizeCouponError(couponError);
 
   await supabase.from('matches').delete().eq('coupon_id', couponId);
 
