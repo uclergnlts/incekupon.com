@@ -21,44 +21,52 @@ interface CouponPayload {
   matches: MatchInput[];
 }
 
-function validateCouponUrl(value: string): string {
+type CouponActionResult = { ok: true } | { ok: false; message: string };
+
+function normalizeCouponUrl(value: string): { ok: true; url: string } | { ok: false; message: string } {
   const raw = value.trim();
   const normalized = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
 
   try {
     const parsed = new URL(normalized);
     if (!['http:', 'https:'].includes(parsed.protocol)) {
-      throw new Error();
+      return { ok: false, message: 'Gecerli bir kupon linki girin.' };
     }
-    return parsed.toString();
+    return { ok: true, url: parsed.toString() };
   } catch {
-    throw new Error('Gecerli bir kupon linki girin (ornek: https://site.com/kupon)');
+    return { ok: false, message: 'Gecerli bir kupon linki girin (ornek: https://site.com/kupon).' };
   }
 }
 
-function normalizeCouponError(error: unknown): never {
+function mapCouponDbError(error: unknown): string {
   if (
     typeof error === 'object' &&
     error !== null &&
     'message' in error &&
-    typeof (error as { message: unknown }).message === 'string' &&
-    (error as { message: string }).message.includes('played_coupon_url')
+    typeof (error as { message: unknown }).message === 'string'
   ) {
-    throw new Error('Veritabani guncel degil: supabase-coupon-played-link.sql dosyasini calistirin.');
+    const message = (error as { message: string }).message;
+    if (message.includes('played_coupon_url')) {
+      return 'Veritabani guncel degil: supabase-coupon-played-link.sql dosyasini calistirin.';
+    }
+    return message;
   }
 
-  throw error;
+  return 'Beklenmeyen bir hata olustu.';
 }
 
-export async function createCoupon(data: CouponPayload) {
+export async function createCoupon(data: CouponPayload): Promise<CouponActionResult> {
   const supabase = await createClient();
-  const playedCouponUrl = validateCouponUrl(data.played_coupon_url);
+  const normalizedUrl = normalizeCouponUrl(data.played_coupon_url);
+  if (!normalizedUrl.ok) return normalizedUrl;
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error('Yetkisiz erisim');
+  if (!user) {
+    return { ok: false, message: 'Oturum bulunamadi. Lutfen tekrar giris yapin.' };
+  }
 
   const totalOdds = data.matches.reduce((acc, match) => acc * match.odds, 1);
 
@@ -66,7 +74,7 @@ export async function createCoupon(data: CouponPayload) {
     .from('coupons')
     .insert({
       date: data.date,
-      played_coupon_url: playedCouponUrl,
+      played_coupon_url: normalizedUrl.url,
       notes: data.notes || null,
       total_odds: Math.round(totalOdds * 100) / 100,
       status: 'pending',
@@ -74,7 +82,9 @@ export async function createCoupon(data: CouponPayload) {
     .select()
     .single();
 
-  if (couponError) normalizeCouponError(couponError);
+  if (couponError) {
+    return { ok: false, message: mapCouponDbError(couponError) };
+  }
 
   const matchesData = data.matches.map(match => ({
     ...match,
@@ -83,22 +93,27 @@ export async function createCoupon(data: CouponPayload) {
   }));
 
   const { error: matchesError } = await supabase.from('matches').insert(matchesData);
-  if (matchesError) throw matchesError;
+  if (matchesError) {
+    return { ok: false, message: mapCouponDbError(matchesError) };
+  }
 
   revalidatePath('/');
   revalidatePath('/admin');
   redirect('/admin');
 }
 
-export async function updateCoupon(couponId: string, data: CouponPayload) {
+export async function updateCoupon(couponId: string, data: CouponPayload): Promise<CouponActionResult> {
   const supabase = await createClient();
-  const playedCouponUrl = validateCouponUrl(data.played_coupon_url);
+  const normalizedUrl = normalizeCouponUrl(data.played_coupon_url);
+  if (!normalizedUrl.ok) return normalizedUrl;
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error('Yetkisiz erisim');
+  if (!user) {
+    return { ok: false, message: 'Oturum bulunamadi. Lutfen tekrar giris yapin.' };
+  }
 
   const totalOdds = data.matches.reduce((acc, match) => acc * match.odds, 1);
 
@@ -106,13 +121,15 @@ export async function updateCoupon(couponId: string, data: CouponPayload) {
     .from('coupons')
     .update({
       date: data.date,
-      played_coupon_url: playedCouponUrl,
+      played_coupon_url: normalizedUrl.url,
       notes: data.notes || null,
       total_odds: Math.round(totalOdds * 100) / 100,
     })
     .eq('id', couponId);
 
-  if (couponError) normalizeCouponError(couponError);
+  if (couponError) {
+    return { ok: false, message: mapCouponDbError(couponError) };
+  }
 
   await supabase.from('matches').delete().eq('coupon_id', couponId);
 
@@ -123,11 +140,14 @@ export async function updateCoupon(couponId: string, data: CouponPayload) {
   }));
 
   const { error: matchesError } = await supabase.from('matches').insert(matchesData);
-  if (matchesError) throw matchesError;
+  if (matchesError) {
+    return { ok: false, message: mapCouponDbError(matchesError) };
+  }
 
   revalidatePath('/');
   revalidatePath('/admin');
   revalidatePath(`/admin/kupon/${couponId}`);
+  return { ok: true };
 }
 
 export async function updateMatchResult(matchId: string, result: 'pending' | 'won' | 'lost') {

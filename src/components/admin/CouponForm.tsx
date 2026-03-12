@@ -94,10 +94,20 @@ export default function CouponForm({ coupon }: CouponFormProps) {
       };
 
       if (isEdit) {
-        await updateCoupon(coupon.id, payload);
+        const result = await updateCoupon(coupon.id, payload);
+        if (!result.ok) {
+          toast.error(result.message);
+          setLoading(false);
+          return;
+        }
         toast.success('Kupon guncellendi.');
       } else {
-        await createCoupon(payload);
+        const result = await createCoupon(payload);
+        if (!result.ok) {
+          toast.error(result.message);
+          setLoading(false);
+          return;
+        }
         toast.success('Kupon olusturuldu.');
       }
     } catch (error) {
