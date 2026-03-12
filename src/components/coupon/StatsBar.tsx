@@ -1,5 +1,5 @@
 import type { CouponStats } from '@/types';
-import { TrendingUp, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { TrendingUp, CheckCircle, XCircle } from 'lucide-react';
 
 interface StatsBarProps {
   stats: CouponStats;

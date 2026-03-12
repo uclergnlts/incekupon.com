@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createCoupon, updateCoupon } from '@/lib/actions/coupon-actions';
@@ -30,6 +31,7 @@ interface CouponFormProps {
 
 export default function CouponForm({ coupon }: CouponFormProps) {
   const isEdit = !!coupon;
+  const router = useRouter();
 
   const [date, setDate] = useState(coupon?.date ?? new Date().toISOString().split('T')[0]);
   const [playedCouponUrl, setPlayedCouponUrl] = useState(coupon?.played_coupon_url ?? '');
@@ -101,6 +103,8 @@ export default function CouponForm({ coupon }: CouponFormProps) {
           return;
         }
         toast.success('Kupon guncellendi.');
+        router.refresh();
+        setLoading(false);
       } else {
         const result = await createCoupon(payload);
         if (!result.ok) {
@@ -109,6 +113,8 @@ export default function CouponForm({ coupon }: CouponFormProps) {
           return;
         }
         toast.success('Kupon olusturuldu.');
+        router.push('/admin');
+        router.refresh();
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Bir hata olustu.';

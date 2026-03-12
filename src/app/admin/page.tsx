@@ -1,7 +1,7 @@
 import { getCoupons, getCouponStats } from '@/lib/queries/coupons';
 import { formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
 import Link from 'next/link';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit } from 'lucide-react';
 import DeleteCouponButton from '@/components/admin/DeleteCouponButton';
 
 export default async function AdminDashboard() {

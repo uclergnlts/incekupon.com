@@ -5,7 +5,7 @@ import { getCurrentTotoWeek, getTotoWeeks } from '@/lib/queries/spor-toto';
 
 export const metadata: Metadata = {
   title: 'Spor Toto - incekupon',
-  description: 'Haftalik Spor Toto 13 mac tahminleri.',
+  description: 'Haftalik Spor Toto 15 mac tahminleri.',
 };
 
 export default async function SporTotoPage() {

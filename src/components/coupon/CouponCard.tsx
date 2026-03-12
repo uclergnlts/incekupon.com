@@ -1,7 +1,7 @@
 import type { Coupon } from '@/types';
 import { formatDate, getStatusColor, getStatusLabel } from '@/lib/utils';
 import MatchRow from './MatchRow';
-import { Calendar } from 'lucide-react';
+import { Calendar, ExternalLink } from 'lucide-react';
 import CouponShareButton from './CouponShareButton';
 
 interface CouponCardProps {
@@ -39,6 +39,20 @@ export default function CouponCard({ coupon, showResult = true }: CouponCardProp
           <MatchRow key={match.id} match={match} showResult={showResult} />
         ))}
       </div>
+
+      {coupon.played_coupon_url && (
+        <div className="px-4 py-2 border-t border-border">
+          <a
+            href={coupon.played_coupon_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-dark"
+          >
+            Oynadigimiz Kupon Linki
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+      )}
 
       {/* Notes */}
       {coupon.notes && (

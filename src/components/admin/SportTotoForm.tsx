@@ -1,10 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createTotoWeek, updateTotoWeek } from '@/lib/actions/spor-toto-actions';
 import { normalizePrediction, splitPrediction } from '@/lib/spor-toto-prediction';
 import type { SportTotoWeek, TotoOutcome, TotoPrediction } from '@/types';
+
+const WEEK_MATCH_COUNT = 15;
+const PREDICTION_OPTIONS: TotoOutcome[] = ['1', '0', '2'];
 
 interface TotoMatchForm {
   match_number: number;
@@ -18,50 +22,54 @@ interface SportTotoFormProps {
   week?: SportTotoWeek;
 }
 
-const PREDICTION_OPTIONS: TotoOutcome[] = ['1', '0', '2'];
+function buildInitialMatches(week?: SportTotoWeek): TotoMatchForm[] {
+  const byNumber = new Map<number, TotoMatchForm>();
+
+  for (const match of week?.spor_toto_matches ?? []) {
+    byNumber.set(match.match_number, {
+      match_number: match.match_number,
+      home_team: match.home_team,
+      away_team: match.away_team,
+      prediction: normalizePrediction(match.prediction),
+      actual_result: match.actual_result,
+    });
+  }
+
+  return Array.from({ length: WEEK_MATCH_COUNT }, (_, index) => {
+    const number = index + 1;
+    return (
+      byNumber.get(number) ?? {
+        match_number: number,
+        home_team: '',
+        away_team: '',
+        prediction: '1',
+        actual_result: null,
+      }
+    );
+  });
+}
 
 export default function SportTotoForm({ week }: SportTotoFormProps) {
   const isEdit = !!week;
+  const router = useRouter();
 
   const [weekLabel, setWeekLabel] = useState(week?.week_label ?? '');
   const [date, setDate] = useState(week?.date ?? new Date().toISOString().split('T')[0]);
-  const [matches, setMatches] = useState<TotoMatchForm[]>(() => {
-    if (week?.spor_toto_matches?.length) {
-      return week.spor_toto_matches
-        .sort((a, b) => a.match_number - b.match_number)
-        .map(match => ({
-          match_number: match.match_number,
-          home_team: match.home_team,
-          away_team: match.away_team,
-          prediction: normalizePrediction(match.prediction),
-          actual_result: match.actual_result,
-        }));
-    }
-
-    return Array.from({ length: 13 }, (_, index) => ({
-      match_number: index + 1,
-      home_team: '',
-      away_team: '',
-      prediction: '1',
-      actual_result: null,
-    }));
-  });
+  const [matches, setMatches] = useState<TotoMatchForm[]>(() => buildInitialMatches(week));
   const [loading, setLoading] = useState(false);
 
   function updateMatch(index: number, field: keyof TotoMatchForm, value: string | number | null) {
-    const updatedMatches = [...matches];
-    updatedMatches[index] = { ...updatedMatches[index], [field]: value };
-    setMatches(updatedMatches);
+    const updated = [...matches];
+    updated[index] = { ...updated[index], [field]: value };
+    setMatches(updated);
   }
 
   function togglePrediction(index: number, option: TotoOutcome) {
-    const match = matches[index];
-    const selected = splitPrediction(match.prediction);
+    const current = matches[index];
+    const selected = splitPrediction(current.prediction);
     const hasOption = selected.includes(option);
 
-    if (hasOption && selected.length === 1) {
-      return;
-    }
+    if (hasOption && selected.length === 1) return;
 
     const next = hasOption
       ? selected.filter(item => item !== option)
@@ -76,14 +84,42 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
 
     try {
       if (isEdit) {
-        await updateTotoWeek(week.id, { week_label: weekLabel, date, matches });
+        const result = await updateTotoWeek(week.id, {
+          week_label: weekLabel,
+          date,
+          matches,
+        });
+
+        if (!result.ok) {
+          toast.error(result.message);
+          setLoading(false);
+          return;
+        }
+
         toast.success('Hafta guncellendi.');
-      } else {
-        await createTotoWeek({ week_label: weekLabel, date, matches });
-        toast.success('Hafta olusturuldu.');
+        router.refresh();
+        setLoading(false);
+        return;
       }
-    } catch {
-      toast.error('Bir hata olustu.');
+
+      const result = await createTotoWeek({
+        week_label: weekLabel,
+        date,
+        matches,
+      });
+
+      if (!result.ok) {
+        toast.error(result.message);
+        setLoading(false);
+        return;
+      }
+
+      toast.success('Hafta olusturuldu.');
+      router.push('/admin/spor-toto');
+      router.refresh();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Bir hata olustu.';
+      toast.error(message);
       setLoading(false);
     }
   }
@@ -115,6 +151,10 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
         </div>
       </div>
 
+      <div className="text-sm text-muted">
+        Haftalik mac sayisi: <span className="font-semibold text-foreground">{WEEK_MATCH_COUNT}</span>
+      </div>
+
       <div className="bg-white rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -133,7 +173,7 @@ export default function SportTotoForm({ week }: SportTotoFormProps) {
               const selected = splitPrediction(match.prediction);
 
               return (
-                <tr key={index} className="border-b border-gray-100 last:border-0">
+                <tr key={match.match_number} className="border-b border-gray-100 last:border-0">
                   <td className="px-3 py-2 text-muted">{match.match_number}</td>
 
                   <td className="px-3 py-2">

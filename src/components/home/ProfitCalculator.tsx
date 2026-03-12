@@ -22,7 +22,7 @@ export default function ProfitCalculator({ initialOdds }: ProfitCalculatorProps)
     <section className="bg-white rounded-xl border border-border p-6 space-y-4">
       <div>
         <h2 className="text-lg font-bold">Kazanc Hesaplayici</h2>
-        <p className="text-sm text-muted">"100 TL yatirsam ne kazanirim?" sorusunun hizli cevabi.</p>
+        <p className="text-sm text-muted">100 TL yatirsam ne kazanirim sorusunun hizli cevabi.</p>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">

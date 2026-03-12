@@ -20,6 +20,20 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## API-Football Setup
+
+Kupon sonuc senkronizasyonu icin `.env.local` dosyasina su degiskeni ekleyin:
+
+```bash
+API_FOOTBALL_KEY=your_api_football_key
+```
+
+Opsiyonel olarak base URL degistirebilirsiniz:
+
+```bash
+API_FOOTBALL_BASE_URL=https://v3.football.api-sports.io
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

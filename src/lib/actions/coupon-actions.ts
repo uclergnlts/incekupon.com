@@ -1,8 +1,15 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import {
+  fetchApiFootballFixturesByDate,
+  findBestFixture,
+  getMatchDateKey,
+  isFinishedFixture,
+  shiftDateKey,
+} from '@/lib/api-football';
+import { evaluatePrediction } from '@/lib/prediction-evaluator';
 
 interface MatchInput {
   league: string;
@@ -22,6 +29,13 @@ interface CouponPayload {
 }
 
 type CouponActionResult = { ok: true } | { ok: false; message: string };
+type SyncActionResult = {
+  ok: boolean;
+  message: string;
+  updatedCount: number;
+  pendingCount: number;
+  unmatchedCount: number;
+};
 
 function normalizeCouponUrl(value: string): { ok: true; url: string } | { ok: false; message: string } {
   const raw = value.trim();
@@ -99,7 +113,7 @@ export async function createCoupon(data: CouponPayload): Promise<CouponActionRes
 
   revalidatePath('/');
   revalidatePath('/admin');
-  redirect('/admin');
+  return { ok: true };
 }
 
 export async function updateCoupon(couponId: string, data: CouponPayload): Promise<CouponActionResult> {
@@ -167,7 +181,152 @@ export async function updateMatchResult(matchId: string, result: 'pending' | 'wo
   revalidatePath('/gecmis-kuponlar');
 }
 
-export async function deleteCoupon(couponId: string) {
+export async function syncCouponResultsFromApiFootball(couponId: string): Promise<SyncActionResult> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: 'Oturum bulunamadi. Lutfen tekrar giris yapin.',
+      updatedCount: 0,
+      pendingCount: 0,
+      unmatchedCount: 0,
+    };
+  }
+
+  const { data: coupon, error } = await supabase
+    .from('coupons')
+    .select('id, matches(*)')
+    .eq('id', couponId)
+    .single();
+
+  if (error || !coupon) {
+    return {
+      ok: false,
+      message: 'Kupon bulunamadi.',
+      updatedCount: 0,
+      pendingCount: 0,
+      unmatchedCount: 0,
+    };
+  }
+
+  const matches = (coupon.matches ?? []) as Array<{
+    id: string;
+    home_team: string;
+    away_team: string;
+    match_time: string;
+    prediction: string;
+    result: 'pending' | 'won' | 'lost';
+  }>;
+
+  if (matches.length === 0) {
+    return {
+      ok: false,
+      message: 'Kuponda mac bulunmuyor.',
+      updatedCount: 0,
+      pendingCount: 0,
+      unmatchedCount: 0,
+    };
+  }
+
+  const fixtureCache = new Map<string, Awaited<ReturnType<typeof fetchApiFootballFixturesByDate>>>();
+
+  async function getFixturesForDate(dateKey: string) {
+    if (!fixtureCache.has(dateKey)) {
+      fixtureCache.set(dateKey, await fetchApiFootballFixturesByDate(dateKey));
+    }
+    return fixtureCache.get(dateKey)!;
+  }
+
+  let updatedCount = 0;
+  let pendingCount = 0;
+  let unmatchedCount = 0;
+
+  for (const match of matches) {
+    const baseDate = getMatchDateKey(match.match_time);
+    const dateKeys = [baseDate, shiftDateKey(baseDate, -1), shiftDateKey(baseDate, 1)];
+
+    const dateResults = await Promise.all(dateKeys.map(getFixturesForDate));
+    const failedResult = dateResults.find(item => !item.ok);
+    if (failedResult && failedResult.message) {
+      return {
+        ok: false,
+        message: failedResult.message,
+        updatedCount,
+        pendingCount,
+        unmatchedCount,
+      };
+    }
+
+    const fixtures = dateResults.flatMap(item => item.fixtures);
+    const matchedFixture = findBestFixture(match, fixtures);
+
+    if (!matchedFixture) {
+      unmatchedCount += 1;
+      continue;
+    }
+
+    if (!isFinishedFixture(matchedFixture.statusShort)) {
+      pendingCount += 1;
+      continue;
+    }
+
+    if (matchedFixture.homeGoals == null || matchedFixture.awayGoals == null) {
+      pendingCount += 1;
+      continue;
+    }
+
+    const evaluation = evaluatePrediction(
+      match.prediction,
+      matchedFixture.homeGoals,
+      matchedFixture.awayGoals,
+    );
+
+    if (evaluation == null) {
+      pendingCount += 1;
+      continue;
+    }
+
+    const nextResult: 'won' | 'lost' = evaluation ? 'won' : 'lost';
+    if (match.result === nextResult) continue;
+
+    const { error: updateError } = await supabase
+      .from('matches')
+      .update({ result: nextResult })
+      .eq('id', match.id);
+
+    if (updateError) {
+      return {
+        ok: false,
+        message: mapCouponDbError(updateError),
+        updatedCount,
+        pendingCount,
+        unmatchedCount,
+      };
+    }
+
+    updatedCount += 1;
+  }
+
+  revalidatePath('/');
+  revalidatePath('/admin');
+  revalidatePath(`/admin/kupon/${couponId}`);
+  revalidatePath('/gecmis-kuponlar');
+
+  return {
+    ok: true,
+    message: `API senkronu tamamlandi. Guncellenen: ${updatedCount}, Beklemede: ${pendingCount}, Eslesmeyen: ${unmatchedCount}.`,
+    updatedCount,
+    pendingCount,
+    unmatchedCount,
+  };
+}
+
+export async function deleteCoupon(couponId: string): Promise<CouponActionResult> {
   const supabase = await createClient();
 
   const {
@@ -177,9 +336,9 @@ export async function deleteCoupon(couponId: string) {
   if (!user) throw new Error('Yetkisiz erisim');
 
   const { error } = await supabase.from('coupons').delete().eq('id', couponId);
-  if (error) throw error;
+  if (error) return { ok: false, message: mapCouponDbError(error) } as const;
 
   revalidatePath('/');
   revalidatePath('/admin');
-  redirect('/admin');
+  return { ok: true } as const;
 }

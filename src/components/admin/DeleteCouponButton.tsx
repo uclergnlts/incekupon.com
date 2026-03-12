@@ -1,18 +1,27 @@
 'use client';
 
-import { deleteCoupon } from '@/lib/actions/coupon-actions';
+import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { deleteCoupon } from '@/lib/actions/coupon-actions';
 
 export default function DeleteCouponButton({ couponId }: { couponId: string }) {
+  const router = useRouter();
+
   async function handleDelete() {
-    if (!confirm('Bu kuponu silmek istediğinize emin misiniz?')) return;
+    if (!confirm('Bu kuponu silmek istediginize emin misiniz?')) return;
 
     try {
-      await deleteCoupon(couponId);
+      const result = await deleteCoupon(couponId);
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+
       toast.success('Kupon silindi.');
+      router.refresh();
     } catch {
-      toast.error('Kupon silinirken hata oluştu.');
+      toast.error('Kupon silinirken hata olustu.');
     }
   }
 
