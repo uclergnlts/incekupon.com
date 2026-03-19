@@ -1,15 +1,8 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import {
-  fetchApiFootballFixturesByDate,
-  findBestFixture,
-  getMatchDateKey,
-  isFinishedFixture,
-  shiftDateKey,
-} from '@/lib/api-football';
-import { evaluatePrediction } from '@/lib/prediction-evaluator';
+import { revalidateCouponPaths } from '@/lib/coupon-revalidation';
+import { syncCouponResults } from '@/lib/coupon-result-sync';
 
 interface MatchInput {
   league: string;
@@ -32,6 +25,8 @@ type CouponActionResult = { ok: true } | { ok: false; message: string };
 type SyncActionResult = {
   ok: boolean;
   message: string;
+  couponsChecked: number;
+  checkedMatchCount: number;
   updatedCount: number;
   pendingCount: number;
   unmatchedCount: number;
@@ -111,8 +106,7 @@ export async function createCoupon(data: CouponPayload): Promise<CouponActionRes
     return { ok: false, message: mapCouponDbError(matchesError) };
   }
 
-  revalidatePath('/');
-  revalidatePath('/admin');
+  revalidateCouponPaths([coupon.id]);
   return { ok: true };
 }
 
@@ -158,9 +152,7 @@ export async function updateCoupon(couponId: string, data: CouponPayload): Promi
     return { ok: false, message: mapCouponDbError(matchesError) };
   }
 
-  revalidatePath('/');
-  revalidatePath('/admin');
-  revalidatePath(`/admin/kupon/${couponId}`);
+  revalidateCouponPaths([couponId]);
   return { ok: true };
 }
 
@@ -176,9 +168,7 @@ export async function updateMatchResult(matchId: string, result: 'pending' | 'wo
   const { error } = await supabase.from('matches').update({ result }).eq('id', matchId);
   if (error) throw error;
 
-  revalidatePath('/');
-  revalidatePath('/admin');
-  revalidatePath('/gecmis-kuponlar');
+  revalidateCouponPaths();
 }
 
 export async function syncCouponResultsFromApiFootball(couponId: string): Promise<SyncActionResult> {
@@ -192,6 +182,8 @@ export async function syncCouponResultsFromApiFootball(couponId: string): Promis
     return {
       ok: false,
       message: 'Oturum bulunamadi. Lutfen tekrar giris yapin.',
+      couponsChecked: 0,
+      checkedMatchCount: 0,
       updatedCount: 0,
       pendingCount: 0,
       unmatchedCount: 0,
@@ -208,6 +200,8 @@ export async function syncCouponResultsFromApiFootball(couponId: string): Promis
     return {
       ok: false,
       message: 'Kupon bulunamadi.',
+      couponsChecked: 0,
+      checkedMatchCount: 0,
       updatedCount: 0,
       pendingCount: 0,
       unmatchedCount: 0,
@@ -227,103 +221,21 @@ export async function syncCouponResultsFromApiFootball(couponId: string): Promis
     return {
       ok: false,
       message: 'Kuponda mac bulunmuyor.',
+      couponsChecked: 0,
+      checkedMatchCount: 0,
       updatedCount: 0,
       pendingCount: 0,
       unmatchedCount: 0,
     };
   }
 
-  const fixtureCache = new Map<string, Awaited<ReturnType<typeof fetchApiFootballFixturesByDate>>>();
+  const result = await syncCouponResults(supabase, { couponId });
 
-  async function getFixturesForDate(dateKey: string) {
-    if (!fixtureCache.has(dateKey)) {
-      fixtureCache.set(dateKey, await fetchApiFootballFixturesByDate(dateKey));
-    }
-    return fixtureCache.get(dateKey)!;
+  if (result.updatedCouponIds.length > 0) {
+    revalidateCouponPaths(result.updatedCouponIds);
   }
 
-  let updatedCount = 0;
-  let pendingCount = 0;
-  let unmatchedCount = 0;
-
-  for (const match of matches) {
-    const baseDate = getMatchDateKey(match.match_time);
-    const dateKeys = [baseDate, shiftDateKey(baseDate, -1), shiftDateKey(baseDate, 1)];
-
-    const dateResults = await Promise.all(dateKeys.map(getFixturesForDate));
-    const failedResult = dateResults.find(item => !item.ok);
-    if (failedResult && failedResult.message) {
-      return {
-        ok: false,
-        message: failedResult.message,
-        updatedCount,
-        pendingCount,
-        unmatchedCount,
-      };
-    }
-
-    const fixtures = dateResults.flatMap(item => item.fixtures);
-    const matchedFixture = findBestFixture(match, fixtures);
-
-    if (!matchedFixture) {
-      unmatchedCount += 1;
-      continue;
-    }
-
-    if (!isFinishedFixture(matchedFixture.statusShort)) {
-      pendingCount += 1;
-      continue;
-    }
-
-    if (matchedFixture.homeGoals == null || matchedFixture.awayGoals == null) {
-      pendingCount += 1;
-      continue;
-    }
-
-    const evaluation = evaluatePrediction(
-      match.prediction,
-      matchedFixture.homeGoals,
-      matchedFixture.awayGoals,
-    );
-
-    if (evaluation == null) {
-      pendingCount += 1;
-      continue;
-    }
-
-    const nextResult: 'won' | 'lost' = evaluation ? 'won' : 'lost';
-    if (match.result === nextResult) continue;
-
-    const { error: updateError } = await supabase
-      .from('matches')
-      .update({ result: nextResult })
-      .eq('id', match.id);
-
-    if (updateError) {
-      return {
-        ok: false,
-        message: mapCouponDbError(updateError),
-        updatedCount,
-        pendingCount,
-        unmatchedCount,
-      };
-    }
-
-    updatedCount += 1;
-  }
-
-  revalidatePath('/');
-  revalidatePath('/admin');
-  revalidatePath(`/admin/kupon/${couponId}`);
-  revalidatePath('/gecmis-kuponlar');
-
-  return {
-    ok: true,
-    message: `API senkronu tamamlandi. Guncellenen: ${updatedCount}, Beklemede: ${pendingCount}, Eslesmeyen: ${unmatchedCount}.`,
-    updatedCount,
-    pendingCount,
-    unmatchedCount,
-  };
+  return result;
 }
 
 export async function deleteCoupon(couponId: string): Promise<CouponActionResult> {
@@ -338,7 +250,6 @@ export async function deleteCoupon(couponId: string): Promise<CouponActionResult
   const { error } = await supabase.from('coupons').delete().eq('id', couponId);
   if (error) return { ok: false, message: mapCouponDbError(error) } as const;
 
-  revalidatePath('/');
-  revalidatePath('/admin');
+  revalidateCouponPaths();
   return { ok: true } as const;
 }

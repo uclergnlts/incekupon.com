@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { ensureAutomaticCouponResultSync } from '@/lib/coupon-result-sync';
 import type { Coupon, CouponStats, MonthlyCouponStat } from '@/types';
 
 export async function getTodayCoupons(): Promise<Coupon[]> {
@@ -21,6 +22,8 @@ export async function getCoupons(filters?: {
   page?: number;
   limit?: number;
 }): Promise<{ coupons: Coupon[]; count: number }> {
+  await ensureAutomaticCouponResultSync();
+
   const supabase = await createClient();
   const page = filters?.page ?? 1;
   const limit = filters?.limit ?? 10;
@@ -49,6 +52,8 @@ export async function getCoupons(filters?: {
 }
 
 export async function getCouponById(id: string): Promise<Coupon | null> {
+  await ensureAutomaticCouponResultSync();
+
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -62,6 +67,8 @@ export async function getCouponById(id: string): Promise<Coupon | null> {
 }
 
 export async function getRecentCoupons(limit: number = 5): Promise<Coupon[]> {
+  await ensureAutomaticCouponResultSync();
+
   const supabase = await createClient();
   const today = new Date().toISOString().split('T')[0];
 
@@ -77,6 +84,8 @@ export async function getRecentCoupons(limit: number = 5): Promise<Coupon[]> {
 }
 
 export async function getCouponStats(): Promise<CouponStats> {
+  await ensureAutomaticCouponResultSync();
+
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -97,6 +106,8 @@ export async function getCouponStats(): Promise<CouponStats> {
 }
 
 export async function getMonthlyCouponStats(monthCount: number = 6): Promise<MonthlyCouponStat[]> {
+  await ensureAutomaticCouponResultSync();
+
   const supabase = await createClient();
   const now = new Date();
   const firstMonth = new Date(now.getFullYear(), now.getMonth() - (monthCount - 1), 1);

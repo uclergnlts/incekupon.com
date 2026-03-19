@@ -26,6 +26,7 @@ Kupon sonuc senkronizasyonu icin `.env.local` dosyasina su degiskeni ekleyin:
 
 ```bash
 API_FOOTBALL_KEY=your_api_football_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
 Opsiyonel olarak base URL degistirebilirsiniz:
@@ -33,6 +34,8 @@ Opsiyonel olarak base URL degistirebilirsiniz:
 ```bash
 API_FOOTBALL_BASE_URL=https://v3.football.api-sports.io
 ```
+
+Uretimde `vercel.json` icindeki cron gorevi `/api/cron/sync` endpoint'ini 15 dakikada bir cagirir. Route ayrica servis rolunu kullanarak kupon ve mac sonucunu otomatik gunceller.
 
 ## Learn More
 
